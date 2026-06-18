@@ -29,7 +29,7 @@ return [
         'prefix' => env('TENANCY_DB_PREFIX', 'simpleorder_tenant_'),
         'suffix' => '',
         'managers' => [
-            'mysql' => Stancl\TenancyForLaravel\DatabaseManagers\MySQLDatabaseManager::class,
+            'mysql' => Stancl\Tenancy\Database\DatabaseManager::class,
         ],
     ],
 
@@ -48,7 +48,6 @@ return [
                 'url_override' => '/storage/tenant%tenant%',
             ],
         ],
-        'root_override_option' => Stancl\Tenancy\StorageDrivers\Local\LocalStorageDriver::OPTION_PREPEND_TENANT_PREFIX,
         'suffix_storage_path' => true,
         'asset_helper_tenancy' => false,
     ],
