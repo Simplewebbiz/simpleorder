@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Vite (Asset Bundler)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 5173
+    },
+    {
+      "name": "Laravel Dev Server",
+      "runtimeExecutable": "php",
+      "runtimeArgs": ["artisan", "serve", "--host=0.0.0.0", "--port=8000"],
+      "port": 8000
+    },
+    {
+      "name": "Laravel Reverb (WebSockets)",
+      "runtimeExecutable": "php",
+      "runtimeArgs": ["artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"],
+      "port": 8080
+    },
+    {
+      "name": "Laravel Queue Worker",
+      "runtimeExecutable": "php",
+      "runtimeArgs": ["artisan", "queue:work", "--tries=3"],
+      "port": 0
+    }
+  ]
+}
