@@ -19,7 +19,8 @@
         "vue": "^3.4",
         "vue-chartjs": "^5.3",
         "vue-router": "^4.3",
-        "vuex": "^4.1"
+        "vuex": "^4.1",
+        "pinia": "^2.1"
     },
     "devDependencies": {
         "@vitejs/plugin-vue": "^5.1",
