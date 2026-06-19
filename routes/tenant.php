@@ -9,8 +9,8 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 // All tenant routes share these middleware
 Route::middleware([
-    InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
+    InitializeTenancyByDomain::class,
 ])->group(function () {
 
     // ─── Customer-facing ordering app ────────────────────────────────────
