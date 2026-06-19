@@ -124,7 +124,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useCartStore, isStoreOpen } from '../../../stores/cart'
+import { useCartStore, isStoreOpen } from '../../stores/cart'
 import FormInput from '../UI/FormInput.vue'
 import CheckoutItem from './CheckoutItem.vue'
 import axios from 'axios'
