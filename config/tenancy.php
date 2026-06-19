@@ -12,8 +12,8 @@ return [
     'domain_model' => Domain::class,
 
     'central_domains' => [
-        'simpleorder.com',
-        'www.simpleorder.com',
+        'simpleorder.biz',
+        'www.simpleorder.biz',
     ],
 
     'bootstrappers' => [
