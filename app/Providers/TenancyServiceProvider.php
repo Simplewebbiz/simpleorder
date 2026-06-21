@@ -49,8 +49,7 @@ class TenancyServiceProvider extends ServiceProvider
 
     protected function mapRoutes(): void
     {
-        if (file_exists(base_path('routes/tenant.php'))) {
-            Route::middleware('web')->group(base_path('routes/tenant.php'));
-        }
+        // Routes are loaded via bootstrap/app.php `then` callback
+        // to ensure they are registered AFTER central web routes.
     }
 }

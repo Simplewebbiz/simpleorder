@@ -11,7 +11,8 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__ . '/../routes/console.php',
         channels: __DIR__ . '/../routes/channels.php',
         then: function () {
-            // Tenant routes loaded by TenancyServiceProvider
+            \Illuminate\Support\Facades\Route::middleware('web')
+                ->group(base_path('routes/tenant.php'));
         },
     )
     ->withMiddleware(function (Middleware $middleware) {
