@@ -8,9 +8,9 @@
                 <span class="sa-badge">Super Admin</span>
             </div>
             <nav class="sa-links">
-                <Link :href="route('platform.superadmin.tenants')" class="sa-link">Tenants</Link>
+                <Link :href="route('platform.superadmin.tenants.index')" class="sa-link">Tenants</Link>
                 <Link :href="route('platform.superadmin.settings')" class="sa-link active">API Settings</Link>
-                <Link :href="route('platform.superadmin.plans')" class="sa-link">Plans</Link>
+                <Link :href="route('platform.superadmin.plans.index')" class="sa-link">Plans</Link>
             </nav>
         </header>
 
