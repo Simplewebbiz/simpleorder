@@ -34,7 +34,7 @@
 
             <div class="auth-footer">
                 Don't have an account?
-                <Link :href="route('platform.register')" class="auth-link">Get started free →</Link>
+                <Link :href="route('register')" class="auth-link">Get started free →</Link>
             </div>
         </div>
     </div>
@@ -52,7 +52,7 @@ const form = reactive({ email: '', password: '', remember: false })
 
 function submit() {
     submitting.value = true
-    router.post(route('platform.login'), form, {
+    router.post(route('login.post'), form, {
         onFinish: () => { submitting.value = false },
         onError: () => { form.password = '' },
     })

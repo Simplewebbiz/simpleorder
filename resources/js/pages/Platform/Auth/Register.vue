@@ -62,7 +62,7 @@
 
             <div class="auth-footer">
                 Already have an account?
-                <Link :href="route('platform.login')" class="auth-link">Sign in</Link>
+                <Link :href="route('login')" class="auth-link">Sign in</Link>
             </div>
         </div>
     </div>
@@ -83,7 +83,7 @@ const slug = computed(() => form.store_name.toLowerCase().replace(/[^a-z0-9]+/g,
 
 function submit() {
     submitting.value = true
-    router.post(route('platform.register'), { ...form, slug: slug.value }, {
+    router.post(route('register.post'), { ...form, slug: slug.value }, {
         onFinish: () => { submitting.value = false },
         onError: () => { form.password = '' },
     })
