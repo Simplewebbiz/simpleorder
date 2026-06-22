@@ -29,6 +29,12 @@ class AuthController extends Controller
             return back()->withErrors(['email' => 'Invalid credentials.']);
         }
 
+        $admin = Auth::guard('platform')->user();
+
+        if ($admin->is_super) {
+            return redirect()->route('platform.superadmin.index');
+        }
+
         return redirect()->route('dashboard.index');
     }
 
