@@ -11,30 +11,32 @@ class TenantController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Platform/SuperAdmin/Settings', [
+        return Inertia::render('Platform/SuperAdmin/Tenants', [
             'tenants' => Tenant::with(['plan', 'domains'])->latest()->get(),
         ]);
     }
 
     public function show(Tenant $tenant)
     {
-        return Inertia::render('Platform/SuperAdmin/Settings', [
+        tenancy()->initialize($tenant);
+        $orders = \App\Models\Tenant\Order::with('items')->latest()->limit(50)->get();
+        tenancy()->end();
+
+        return Inertia::render('Platform/SuperAdmin/TenantShow', [
             'tenant' => $tenant->load(['plan', 'domains']),
+            'orders' => $orders,
         ]);
     }
 
     public function destroy(Tenant $tenant)
     {
         $tenant->delete();
-        return redirect()->back()->with('success', 'Tenant deleted.');
+        return redirect()->route('platform.superadmin.tenants.index')->with('success', 'Tenant deleted.');
     }
 
     public function impersonate(Tenant $tenant)
     {
-        $user = $tenant->users()->first();
-        if ($user) {
-            auth('platform')->login($user);
-        }
+        session(['impersonating_tenant' => $tenant->id]);
         return redirect()->route('dashboard.index');
     }
 }
