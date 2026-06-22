@@ -9,6 +9,7 @@
         <script src="https://js.stripe.com/v3/"></script>
     @endif
     @inertiaHead
+    @routes
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="antialiased">
