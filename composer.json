@@ -4,7 +4,7 @@
     "keywords": ["laravel", "saas", "multi-tenant", "ordering"],
     "license": "proprietary",
     "require": {
-        "php": "^8.3",
+        "php": "^8.2",
         "ext-pdo": "*",
         "guzzlehttp/guzzle": "^7.9",
         "inertiajs/inertia-laravel": "^2.0",
