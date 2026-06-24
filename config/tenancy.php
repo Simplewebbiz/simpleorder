@@ -2,8 +2,20 @@
 
 declare(strict_types=1);
 
-use Stancl\Tenancy\Database\Models\Domain;
 use App\Models\Tenant;
+use Stancl\Tenancy\Database\Models\Domain;
+
+$bootstrappers = [
+    Stancl\Tenancy\Bootstrappers\DatabaseTenancyBootstrapper::class,
+    class_exists(Stancl\Tenancy\Bootstrappers\CacheTenancyBootstrapper::class)
+        ? Stancl\Tenancy\Bootstrappers\CacheTenancyBootstrapper::class
+        : null,
+    class_exists(Stancl\Tenancy\Bootstrappers\CacheTagsBootstrapper::class)
+        ? Stancl\Tenancy\Bootstrappers\CacheTagsBootstrapper::class
+        : null,
+    Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper::class,
+    Stancl\Tenancy\Bootstrappers\QueueTenancyBootstrapper::class,
+];
 
 return [
     'tenant_model' => Tenant::class,
@@ -16,12 +28,8 @@ return [
         parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST) ?: 'localhost'
     )))),
 
-    'bootstrappers' => [
-        Stancl\Tenancy\Bootstrappers\DatabaseTenancyBootstrapper::class,
-        Stancl\Tenancy\Bootstrappers\CacheTagsBootstrapper::class,
-        Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper::class,
-        Stancl\Tenancy\Bootstrappers\QueueTenancyBootstrapper::class,
-    ],
+    'bootstrappers' => array_values(array_filter($bootstrappers)),
+
 
     'database' => [
         'central_connection' => env('DB_CONNECTION', 'mysql'),
