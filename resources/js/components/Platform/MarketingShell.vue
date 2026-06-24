@@ -1,12 +1,13 @@
-<template>
+﻿<template>
     <div class="marketing-shell">
         <header class="site-header">
             <Link :href="route('home')" class="brand">SimpleOrder</Link>
             <nav class="nav">
-                <Link :href="route('home')">Home</Link>
-                <Link :href="route('about')">About</Link>
-                <Link :href="route('plans')">Plans</Link>
-                <Link :href="route('contact')">Contact</Link>
+                <Link
+                    v-for="item in navPages"
+                    :key="item.slug"
+                    :href="hrefFor(item.slug)"
+                >{{ item.nav_label || item.title }}</Link>
             </nav>
             <div class="actions">
                 <Link :href="route('login')" class="login-link">Log In</Link>
@@ -22,9 +23,7 @@
                 <p>Restaurant websites, ordering, payments, and guest updates.</p>
             </div>
             <div class="footer-links">
-                <Link :href="route('plans')">Plans</Link>
-                <Link :href="route('about')">About</Link>
-                <Link :href="route('contact')">Contact</Link>
+                <Link v-for="item in navPages" :key="item.slug" :href="hrefFor(item.slug)">{{ item.nav_label || item.title }}</Link>
             </div>
         </footer>
     </div>
@@ -32,6 +31,18 @@
 
 <script setup>
 import { Link } from '@inertiajs/vue3'
+
+defineProps({
+    navPages: { type: Array, default: () => [] },
+})
+
+function hrefFor(slug) {
+    if (slug === 'home') return route('home')
+    if (slug === 'plans') return route('plans')
+    if (slug === 'about') return route('about')
+    if (slug === 'contact') return route('contact')
+    return '/' + slug
+}
 </script>
 
 <style scoped>

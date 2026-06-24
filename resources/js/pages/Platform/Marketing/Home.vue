@@ -1,33 +1,35 @@
-<template>
-    <MarketingShell>
+﻿<template>
+    <MarketingShell :nav-pages="navPages">
         <section class="hero">
             <div class="hero-copy">
-                <p class="eyebrow">Restaurant ordering made lighter</p>
-                <h1>Beautiful food websites that take orders and keep guests updated.</h1>
-                <p class="lede">SimpleOrder gives each restaurant its own homepage, menu, contact page, payments, order dashboard, and easy page editor.</p>
+                <p class="eyebrow">{{ page.eyebrow }}</p>
+                <h1>{{ page.title }}</h1>
+                <p class="lede">{{ page.summary }}</p>
                 <div class="hero-actions">
-                    <Link :href="route('register')" class="primary">Start Your Restaurant Site</Link>
-                    <Link :href="route('plans')" class="secondary">View Plans</Link>
+                    <Link :href="page.cta_url || route('register')" class="primary">{{ page.cta_label || 'Start Your Restaurant Site' }}</Link>
+                    <Link :href="route('plans')" class="secondary">View Pricing</Link>
                 </div>
             </div>
-            <div class="hero-photo" role="img" aria-label="Friends enjoying food at a restaurant"></div>
+            <div class="hero-photo" :style="heroStyle" role="img" aria-label="People enjoying food at a restaurant"></div>
         </section>
 
+        <section class="cms-content" v-if="page.content" v-html="page.content"></section>
+
         <section class="feature-band">
-            <div class="feature-card"><span>01</span><strong>Tenant websites</strong><p>Every restaurant gets Home, About, Contact, and Menu pages.</p></div>
-            <div class="feature-card"><span>02</span><strong>Online ordering</strong><p>Customers order for pickup or delivery with a clean cart flow.</p></div>
-            <div class="feature-card"><span>03</span><strong>Owner dashboard</strong><p>Restaurants see orders, reports, staff, pages, images, and Stripe settings.</p></div>
+            <div class="feature-card"><span>01</span><strong>Restaurant websites</strong><p>Home, About, Pricing, Contact, menu, and order pages built for food businesses.</p></div>
+            <div class="feature-card"><span>02</span><strong>Online ordering</strong><p>Customers order for pickup or delivery with a clean checkout flow.</p></div>
+            <div class="feature-card"><span>03</span><strong>Owner dashboard</strong><p>Restaurants manage orders, reports, staff, pages, images, and Stripe.</p></div>
         </section>
 
         <section class="split-section">
             <div>
                 <p class="eyebrow">Built for daily restaurant work</p>
-                <h2>Menus, payments, text alerts, and email updates in one place.</h2>
+                <h2>Menus, payments, customer updates, and easy editing in one place.</h2>
             </div>
             <div class="check-grid">
                 <div>Menu item photos and categories</div>
                 <div>Stripe payment setup per tenant</div>
-                <div>Order status updates for customers</div>
+                <div>Text and email order updates</div>
                 <div>Reports for sales and order activity</div>
             </div>
         </section>
@@ -49,10 +51,12 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import MarketingShell from '../../../components/Platform/MarketingShell.vue'
 
-defineProps({ plans: Array })
+const props = defineProps({ page: Object, navPages: Array, plans: Array })
+const heroStyle = computed(() => props.page?.hero_image_url ? { backgroundImage: `url(${props.page.hero_image_url})` } : {})
 </script>
 
 <style scoped>
@@ -64,7 +68,12 @@ h1 { font-size: 58px; line-height: 1.02; font-weight: 900; max-width: 720px; }
 .primary, .secondary { border-radius: 8px; padding: 14px 20px; font-weight: 900; text-decoration: none; }
 .primary { background: #ff7a59; color: #fff; }
 .secondary { color: #0f766e; background: #edf7f4; }
-.hero-photo { min-height: 440px; border-radius: 8px; background: url('https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=900&q=80') center/cover; box-shadow: 0 28px 60px rgba(31,45,48,.16); }
+.hero-photo { min-height: 440px; border-radius: 8px; background: linear-gradient(135deg, #fed7aa, #99f6e4); background-position: center; background-size: cover; box-shadow: 0 28px 60px rgba(31,45,48,.16); }
+.cms-content { max-width: 880px; margin: -22px auto 58px; padding: 0 22px; color: #344448; font-size: 18px; line-height: 1.7; }
+.cms-content :deep(h2) { color: #17272b; font-size: 32px; margin-bottom: 12px; }
+.cms-content :deep(h3) { color: #17272b; font-size: 24px; margin: 20px 0 8px; }
+.cms-content :deep(a) { color: #0f766e; font-weight: 900; }
+.cms-content :deep(img) { max-width: 100%; border-radius: 8px; margin: 18px 0; }
 .feature-band { max-width: 1180px; margin: -24px auto 70px; padding: 0 22px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .feature-card, .plan-card { background: #fff; border: 1px solid #f0e4d7; border-radius: 8px; padding: 22px; box-shadow: 0 12px 28px rgba(31,45,48,.06); }
 .feature-card span { color: #ef6c3e; font-weight: 900; font-size: 12px; }

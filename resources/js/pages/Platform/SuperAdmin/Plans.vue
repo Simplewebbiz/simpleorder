@@ -10,6 +10,7 @@
                 <Link :href="route('platform.superadmin.index')" class="sa-link">Dashboard</Link>
                 <Link :href="route('platform.superadmin.tenants.index')" class="sa-link">Tenants</Link>
                 <Link :href="route('platform.superadmin.plans.index')" class="sa-link active">Plans</Link>
+                <Link :href="route('platform.superadmin.marketing-pages.index')" class="sa-link">Website CMS</Link>
                 <Link :href="route('platform.superadmin.settings')" class="sa-link">Settings</Link>
             </nav>
             <Link :href="route('platform.logout')" method="post" as="button" class="sa-logout">Logout</Link>

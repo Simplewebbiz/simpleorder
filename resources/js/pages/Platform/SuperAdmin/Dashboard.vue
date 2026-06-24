@@ -10,6 +10,7 @@
                 <Link :href="route('platform.superadmin.index')" class="sa-link active">Dashboard</Link>
                 <Link :href="route('platform.superadmin.tenants.index')" class="sa-link">Tenants</Link>
                 <Link :href="route('platform.superadmin.plans.index')" class="sa-link">Plans</Link>
+                <Link :href="route('platform.superadmin.marketing-pages.index')" class="sa-link">Website CMS</Link>
                 <Link :href="route('platform.superadmin.settings')" class="sa-link">Settings</Link>
             </nav>
             <Link :href="route('platform.logout')" method="post" as="button" class="sa-logout">Logout</Link>
@@ -51,7 +52,7 @@
                 <tbody>
                     <tr v-for="tenant in recent_tenants" :key="tenant.id">
                         <td><strong>{{ tenant.name }}</strong><br><small>{{ tenant.id }}</small></td>
-                        <td>{{ tenant.plan?.name ?? '—' }}</td>
+                        <td>{{ tenant.plan?.name ?? '-' }}</td>
                         <td><span :class="['badge', tenant.subscription_status]">{{ tenant.subscription_status }}</span></td>
                         <td>{{ formatDate(tenant.created_at) }}</td>
                         <td>
@@ -73,7 +74,7 @@ const props = defineProps({
 })
 
 function formatDate(d) {
-    return d ? new Date(d).toLocaleDateString() : '—'
+    return d ? new Date(d).toLocaleDateString() : '-'
 }
 </script>
 

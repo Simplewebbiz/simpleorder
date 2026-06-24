@@ -9,6 +9,7 @@
             </div>
             <nav class="sa-links">
                 <Link :href="route('platform.superadmin.tenants.index')" class="sa-link">Tenants</Link>
+                <Link :href="route('platform.superadmin.marketing-pages.index')" class="sa-link">Website CMS</Link>
                 <Link :href="route('platform.superadmin.settings')" class="sa-link active">API Settings</Link>
                 <Link :href="route('platform.superadmin.plans.index')" class="sa-link">Plans</Link>
             </nav>
@@ -21,7 +22,7 @@
             </div>
 
             <!-- Flash -->
-            <div class="flash success" v-if="flash?.success">✓ {{ flash.success }}</div>
+            <div class="flash success" v-if="flash?.success">OK {{ flash.success }}</div>
 
             <form @submit.prevent="save">
 
@@ -32,7 +33,7 @@
                             <div class="service-icon stripe">S</div>
                             <div>
                                 <div class="service-name">Stripe</div>
-                                <div class="service-desc">Platform subscription billing (Stripe Billing + Cashier). Tenant payments use Stripe Connect — configured per tenant.</div>
+                                <div class="service-desc">Platform subscription billing (Stripe Billing + Cashier). Tenant payments use Stripe Connect - configured per tenant.</div>
                             </div>
                         </div>
                         <div class="service-status" :class="stripeStatus.cls">{{ stripeStatus.label }}</div>
@@ -47,14 +48,14 @@
                             <label class="field-label">Secret Key <span class="hint">starts with sk_</span></label>
                             <div class="secret-wrap">
                                 <input v-model="form.stripe_secret" :type="show.stripe_secret ? 'text' : 'password'" class="field-input" placeholder="sk_live_..." autocomplete="off" />
-                                <button type="button" class="eye-btn" @click="show.stripe_secret = !show.stripe_secret">{{ show.stripe_secret ? '🙈' : '👁' }}</button>
+                                <button type="button" class="eye-btn" @click="show.stripe_secret = !show.stripe_secret">{{ show.stripe_secret ? 'Hide' : 'Show' }}</button>
                             </div>
                         </div>
                         <div class="field-group">
                             <label class="field-label">Webhook Secret <span class="hint">from Stripe dashboard</span></label>
                             <div class="secret-wrap">
                                 <input v-model="form.stripe_webhook_secret" :type="show.stripe_webhook ? 'text' : 'password'" class="field-input" placeholder="whsec_..." autocomplete="off" />
-                                <button type="button" class="eye-btn" @click="show.stripe_webhook = !show.stripe_webhook">{{ show.stripe_webhook ? '🙈' : '👁' }}</button>
+                                <button type="button" class="eye-btn" @click="show.stripe_webhook = !show.stripe_webhook">{{ show.stripe_webhook ? 'Hide' : 'Show' }}</button>
                             </div>
                         </div>
                         <div class="field-group">
@@ -68,7 +69,7 @@
                             {{ testing === 'stripe' ? 'Testing...' : 'Test Connection' }}
                         </button>
                         <div class="test-result" :class="testResults.stripe?.ok ? 'ok' : 'fail'" v-if="testResults.stripe">
-                            {{ testResults.stripe.ok ? '✓' : '✕' }} {{ testResults.stripe.message }}
+                            {{ testResults.stripe.ok ? 'OK' : 'Error' }} {{ testResults.stripe.message }}
                         </div>
                     </div>
                 </div>
@@ -80,7 +81,7 @@
                             <div class="service-icon resend">R</div>
                             <div>
                                 <div class="service-name">Resend</div>
-                                <div class="service-desc">All transactional email — order confirmations, status updates, subscription reminders.</div>
+                                <div class="service-desc">All transactional email - order confirmations, status updates, subscription reminders.</div>
                             </div>
                         </div>
                         <div class="service-status" :class="resendStatus.cls">{{ resendStatus.label }}</div>
@@ -91,7 +92,7 @@
                             <label class="field-label">API Key <span class="hint">starts with re_</span></label>
                             <div class="secret-wrap">
                                 <input v-model="form.resend_api_key" :type="show.resend ? 'text' : 'password'" class="field-input" placeholder="re_..." autocomplete="off" />
-                                <button type="button" class="eye-btn" @click="show.resend = !show.resend">{{ show.resend ? '🙈' : '👁' }}</button>
+                                <button type="button" class="eye-btn" @click="show.resend = !show.resend">{{ show.resend ? 'Hide' : 'Show' }}</button>
                             </div>
                         </div>
                         <div class="field-group">
@@ -109,7 +110,7 @@
                             {{ testing === 'resend' ? 'Testing...' : 'Test Connection' }}
                         </button>
                         <div class="test-result" :class="testResults.resend?.ok ? 'ok' : 'fail'" v-if="testResults.resend">
-                            {{ testResults.resend.ok ? '✓' : '✕' }} {{ testResults.resend.message }}
+                            {{ testResults.resend.ok ? 'OK' : 'Error' }} {{ testResults.resend.message }}
                         </div>
                     </div>
                 </div>
@@ -143,7 +144,7 @@
                             <label class="field-label">Auth Token</label>
                             <div class="secret-wrap">
                                 <input v-model="form.twilio_token" :type="show.twilio ? 'text' : 'password'" class="field-input" placeholder="Auth token" autocomplete="off" />
-                                <button type="button" class="eye-btn" @click="show.twilio = !show.twilio">{{ show.twilio ? '🙈' : '👁' }}</button>
+                                <button type="button" class="eye-btn" @click="show.twilio = !show.twilio">{{ show.twilio ? 'Hide' : 'Show' }}</button>
                             </div>
                         </div>
                         <div class="field-group">
@@ -160,7 +161,7 @@
                             </button>
                         </div>
                         <div class="test-result" :class="testResults.twilio?.ok ? 'ok' : 'fail'" v-if="testResults.twilio">
-                            {{ testResults.twilio.ok ? '✓' : '✕' }} {{ testResults.twilio.message }}
+                            {{ testResults.twilio.ok ? 'OK' : 'Error' }} {{ testResults.twilio.message }}
                         </div>
                     </div>
                 </div>
@@ -172,7 +173,7 @@
                             <div class="service-icon maps">G</div>
                             <div>
                                 <div class="service-name">Google Maps</div>
-                                <div class="service-desc">Geocoding API used to validate delivery addresses are within a tenant's configured radius. Optional — without it, all addresses are accepted.</div>
+                                <div class="service-desc">Geocoding API used to validate delivery addresses are within a tenant's configured radius. Optional - without it, all addresses are accepted.</div>
                             </div>
                         </div>
                         <div class="service-status" :class="mapsStatus.cls">{{ mapsStatus.label }}</div>
@@ -183,7 +184,7 @@
                             <label class="field-label">API Key <span class="hint">must have Geocoding API enabled</span></label>
                             <div class="secret-wrap">
                                 <input v-model="form.google_maps_api_key" :type="show.maps ? 'text' : 'password'" class="field-input" placeholder="AIzaSy..." autocomplete="off" />
-                                <button type="button" class="eye-btn" @click="show.maps = !show.maps">{{ show.maps ? '🙈' : '👁' }}</button>
+                                <button type="button" class="eye-btn" @click="show.maps = !show.maps">{{ show.maps ? 'Hide' : 'Show' }}</button>
                             </div>
                         </div>
                     </div>
@@ -193,7 +194,7 @@
                             {{ testing === 'google_maps' ? 'Testing...' : 'Test API Key' }}
                         </button>
                         <div class="test-result" :class="testResults.google_maps?.ok ? 'ok' : 'fail'" v-if="testResults.google_maps">
-                            {{ testResults.google_maps.ok ? '✓' : '✕' }} {{ testResults.google_maps.message }}
+                            {{ testResults.google_maps.ok ? 'OK' : 'Error' }} {{ testResults.google_maps.message }}
                         </div>
                     </div>
                 </div>

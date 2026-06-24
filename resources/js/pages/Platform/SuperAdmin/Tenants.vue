@@ -10,6 +10,7 @@
                 <Link :href="route('platform.superadmin.index')" class="sa-link">Dashboard</Link>
                 <Link :href="route('platform.superadmin.tenants.index')" class="sa-link active">Tenants</Link>
                 <Link :href="route('platform.superadmin.plans.index')" class="sa-link">Plans</Link>
+                <Link :href="route('platform.superadmin.marketing-pages.index')" class="sa-link">Website CMS</Link>
                 <Link :href="route('platform.superadmin.settings')" class="sa-link">Settings</Link>
             </nav>
             <Link :href="route('platform.logout')" method="post" as="button" class="sa-logout">Logout</Link>
@@ -46,7 +47,7 @@
                                 {{ d.domain }}<br>
                             </span>
                         </td>
-                        <td>{{ tenant.plan?.name ?? '—' }}</td>
+                        <td>{{ tenant.plan?.name ?? '-' }}</td>
                         <td><span :class="['badge', tenant.subscription_status]">{{ tenant.subscription_status }}</span></td>
                         <td>{{ formatDate(tenant.trial_ends_at) }}</td>
                         <td>{{ formatDate(tenant.created_at) }}</td>
@@ -83,7 +84,7 @@ const filtered = computed(() => {
 })
 
 function formatDate(d) {
-    return d ? new Date(d).toLocaleDateString() : '—'
+    return d ? new Date(d).toLocaleDateString() : '-'
 }
 
 function deleteTenant(tenant) {

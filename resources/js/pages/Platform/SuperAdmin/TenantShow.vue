@@ -10,6 +10,7 @@
                 <Link :href="route('platform.superadmin.index')" class="sa-link">Dashboard</Link>
                 <Link :href="route('platform.superadmin.tenants.index')" class="sa-link active">Tenants</Link>
                 <Link :href="route('platform.superadmin.plans.index')" class="sa-link">Plans</Link>
+                <Link :href="route('platform.superadmin.marketing-pages.index')" class="sa-link">Website CMS</Link>
                 <Link :href="route('platform.superadmin.settings')" class="sa-link">Settings</Link>
             </nav>
             <Link :href="route('platform.logout')" method="post" as="button" class="sa-logout">Logout</Link>
@@ -17,7 +18,7 @@
 
         <main class="sa-main">
             <div class="breadcrumb">
-                <Link :href="route('platform.superadmin.tenants.index')" class="back-link">← Tenants</Link>
+                <Link :href="route('platform.superadmin.tenants.index')" class="back-link">Back to Tenants</Link>
             </div>
 
             <div class="tenant-header">
@@ -25,7 +26,7 @@
                     <h1 class="page-title">{{ tenant.name }}</h1>
                     <div class="tenant-meta">
                         <span class="meta-item">ID: <strong>{{ tenant.id }}</strong></span>
-                        <span class="meta-item">Plan: <strong>{{ tenant.plan?.name ?? '—' }}</strong></span>
+                        <span class="meta-item">Plan: <strong>{{ tenant.plan?.name ?? '-' }}</strong></span>
                         <span :class="['badge', tenant.subscription_status]">{{ tenant.subscription_status }}</span>
                     </div>
                 </div>
@@ -37,7 +38,7 @@
                     <div class="info-row"><span>Status</span><span>{{ tenant.subscription_status }}</span></div>
                     <div class="info-row"><span>Trial Ends</span><span>{{ formatDate(tenant.trial_ends_at) }}</span></div>
                     <div class="info-row"><span>Created</span><span>{{ formatDate(tenant.created_at) }}</span></div>
-                    <div class="info-row"><span>Stripe Customer</span><span>{{ tenant.stripe_id ?? '—' }}</span></div>
+                    <div class="info-row"><span>Stripe Customer</span><span>{{ tenant.stripe_id ?? '-' }}</span></div>
                 </div>
                 <div class="info-card">
                     <h3 class="card-title">Domains</h3>
@@ -65,7 +66,7 @@
                 <tbody>
                     <tr v-for="order in orders" :key="order.id">
                         <td>{{ order.order_number ?? order.id }}</td>
-                        <td>{{ order.customer_name ?? order.customer_email ?? '—' }}</td>
+                        <td>{{ order.customer_name ?? order.customer_email ?? '-' }}</td>
                         <td><span :class="['badge', order.status]">{{ order.status }}</span></td>
                         <td>${{ ((order.total ?? 0) / 100).toFixed(2) }}</td>
                         <td>{{ order.items?.length ?? 0 }}</td>
@@ -89,7 +90,7 @@ const props = defineProps({
 })
 
 function formatDate(d) {
-    return d ? new Date(d).toLocaleDateString() : '—'
+    return d ? new Date(d).toLocaleDateString() : '-'
 }
 </script>
 
