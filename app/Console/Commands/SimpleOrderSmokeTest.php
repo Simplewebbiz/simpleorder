@@ -210,10 +210,30 @@ class SimpleOrderSmokeTest extends Command
 
             if (Schema::hasTable('users')) {
                 $this->passIf(DB::table('users')->count() > 0, "Tenant {$tenant->id} has at least one user", 'Tenant admin login needs a user.');
+                $this->passIf(DB::table('users')->whereIn('role', ['owner', 'manager'])->exists(), "Tenant {$tenant->id} has an admin user", 'Create an owner or manager user for the restaurant admin.');
             }
 
             if (Schema::hasTable('settings')) {
                 $this->passIf(DB::table('settings')->exists(), "Tenant {$tenant->id} has settings rows", 'Tenant store settings may need defaults.');
+                $this->passIf(DB::table('settings')->where('key', 'store_name')->exists(), "Tenant {$tenant->id} has store name setting", 'Tenant store settings may need defaults.');
+            }
+
+            if (Schema::hasTable('pages')) {
+                foreach (['home', 'about', 'contact'] as $slug) {
+                    $this->passIf(DB::table('pages')->where('slug', $slug)->exists(), "Tenant {$tenant->id} CMS page exists: {$slug}", 'Tenant CMS defaults need to be seeded.');
+                }
+            }
+
+            if (Schema::hasTable('categories')) {
+                $this->passIf(DB::table('categories')->whereNull('deleted_at')->count() > 0, "Tenant {$tenant->id} has menu categories", 'Create at least one menu category.');
+            }
+
+            if (Schema::hasTable('items')) {
+                $this->passIf(DB::table('items')->whereNull('deleted_at')->count() > 0, "Tenant {$tenant->id} has menu items", 'Create at least one menu item.');
+            }
+
+            if (Schema::hasTable('orders')) {
+                $this->passIf(DB::table('orders')->whereNull('deleted_at')->count() > 0, "Tenant {$tenant->id} has at least one order", 'Place or seed a test order to verify the order queue and reports.');
             }
         } catch (Throwable $exception) {
             $this->failCheck("Tenant database check failed: {$exception->getMessage()}");
