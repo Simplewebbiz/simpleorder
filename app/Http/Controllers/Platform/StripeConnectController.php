@@ -38,12 +38,15 @@ class StripeConnectController extends Controller
 
     public function callback(Request $request)
     {
+        $tenant = auth('platform')->user()->tenant;
+        $returnUrl = $this->tenantStripeSettingsUrl($tenant);
+
         if ($request->state !== session('stripe_connect_state')) {
-            return redirect()->route('dashboard.settings.stripe')->withErrors(['stripe' => 'Invalid state parameter.']);
+            return redirect($returnUrl)->withErrors(['stripe' => 'Invalid state parameter.']);
         }
 
         if ($request->has('error')) {
-            return redirect()->route('dashboard.settings.stripe')->withErrors(['stripe' => $request->error_description]);
+            return redirect($returnUrl)->withErrors(['stripe' => $request->error_description]);
         }
 
         try {
@@ -52,20 +55,19 @@ class StripeConnectController extends Controller
                 'code'       => $request->code,
             ]);
 
-            auth('platform')->user()->tenant->update([
+            $tenant->update([
                 'stripe_connect_id'           => $response->stripe_user_id,
                 'stripe_connect_access_token' => $response->access_token,
                 'stripe_connect_active'       => true,
             ]);
 
-            // Also save to tenant's own settings DB
-            tenancy()->initialize(auth('platform')->user()->tenant);
+            tenancy()->initialize($tenant);
             \App\Models\Tenant\Setting::set('stripe_connect_id', $response->stripe_user_id);
             tenancy()->end();
 
-            return redirect()->route('dashboard.settings.stripe')->with('success', 'Stripe account connected successfully!');
+            return redirect($returnUrl)->with('success', 'Stripe account connected successfully!');
         } catch (\Exception $e) {
-            return redirect()->route('dashboard.settings.stripe')->withErrors(['stripe' => $e->getMessage()]);
+            return redirect($returnUrl)->withErrors(['stripe' => $e->getMessage()]);
         }
     }
 
@@ -83,6 +85,20 @@ class StripeConnectController extends Controller
         \App\Models\Tenant\Setting::set('stripe_connect_id', null);
         tenancy()->end();
 
-        return back()->with('success', 'Stripe account disconnected.');
+        return redirect($this->tenantStripeSettingsUrl($tenant))->with('success', 'Stripe account disconnected.');
+    }
+
+    private function tenantStripeSettingsUrl($tenant): string
+    {
+        $domain = $tenant->domains()->where('is_primary', true)->value('domain')
+            ?: $tenant->domains()->value('domain');
+
+        if (! $domain) {
+            return route('platform.dashboard');
+        }
+
+        $scheme = parse_url(config('app.url'), PHP_URL_SCHEME) ?: 'https';
+
+        return $scheme . '://' . $domain . '/admin/settings/stripe';
     }
 }

@@ -6,13 +6,13 @@
             </div>
             <nav class="sidebar-nav">
                 <Link :href="route('platform.dashboard')" class="nav-item" :class="{ active: isActive('dashboard') }">
-                    <span class="nav-icon">📊</span> Dashboard
+                    <span class="nav-icon"></span> Dashboard
                 </Link>
                 <Link :href="route('platform.billing.index')" class="nav-item" :class="{ active: isActive('billing') }">
-                    <span class="nav-icon">💳</span> Billing
+                    <span class="nav-icon"></span> Billing
                 </Link>
-                <Link v-if="isSuperAdmin" :href="route('platform.super.settings')" class="nav-item" :class="{ active: isActive('super') }">
-                    <span class="nav-icon">⚙️</span> Super Admin
+                <Link v-if="isSuperAdmin" :href="route('platform.superadmin.settings')" class="nav-item" :class="{ active: isActive('super') }">
+                    <span class="nav-icon"></span> Super Admin
                 </Link>
             </nav>
             <div class="sidebar-footer">
@@ -29,8 +29,8 @@
             </div>
 
             <div class="flash-container" v-if="flash.success || flash.error">
-                <div class="flash success" v-if="flash.success">✓ {{ flash.success }}</div>
-                <div class="flash error" v-if="flash.error">✕ {{ flash.error }}</div>
+                <div class="flash success" v-if="flash.success">Success: {{ flash.success }}</div>
+                <div class="flash error" v-if="flash.error">Error: {{ flash.error }}</div>
             </div>
 
             <div class="content">

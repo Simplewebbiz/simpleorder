@@ -12,37 +12,37 @@
             </div>
 
             <!-- Flash -->
-            <div class="flash success" v-if="flash?.success">✓ {{ flash.success }}</div>
-            <div class="flash error" v-if="flash?.error">✕ {{ flash.error }}</div>
+            <div class="flash success" v-if="flash?.success">Success: {{ flash.success }}</div>
+            <div class="flash error" v-if="flash?.error">Error: {{ flash.error }}</div>
 
-            <!-- ─── Option 1: Stripe Connect ──────────────────────────── -->
+            <!--  Option 1: Stripe Connect  -->
             <div class="option-card" :class="{ active: mode === 'connect' }">
                 <div class="option-head">
                     <div class="option-num">Option 1</div>
                     <div class="option-badge recommended">Recommended</div>
                 </div>
                 <div class="option-body">
-                    <h2 class="option-title">Stripe Connect <span class="option-subtitle">— OAuth</span></h2>
+                    <h2 class="option-title">Stripe Connect <span class="option-subtitle">(OAuth)</span></h2>
                     <p class="option-desc">
                         Connect your existing Stripe account with one click. Customers are charged through the platform and funds are automatically transferred to your account after each order.
                         The platform retains a <strong>{{ feePercent }}% fee</strong> per transaction.
                     </p>
 
                     <div class="connect-benefits">
-                        <div class="benefit">✓ No API keys to copy — just click and authorize</div>
-                        <div class="benefit">✓ Stripe handles fraud detection and disputes</div>
-                        <div class="benefit">✓ Works with your existing Stripe dashboard</div>
-                        <div class="benefit warn">⚠ Platform takes {{ feePercent }}% per order</div>
+                        <div class="benefit">- No API keys to copy; just click and authorize</div>
+                        <div class="benefit">- Stripe handles fraud detection and disputes</div>
+                        <div class="benefit">- Works with your existing Stripe dashboard</div>
+                        <div class="benefit warn">Note: Platform takes {{ feePercent }}% per order</div>
                     </div>
 
                     <!-- Connected state -->
                     <div class="connect-status connected" v-if="connectActive">
-                        <div class="cs-icon">✓</div>
+                        <div class="cs-icon">OK</div>
                         <div class="cs-info">
                             <div class="cs-title">Connected</div>
                             <div class="cs-id">Account ID: {{ connectId }}</div>
                         </div>
-                        <a :href="route('platform.stripe.redirect')" class="reconnect-btn">Reconnect</a>
+                        <a :href="connectUrl" class="reconnect-btn">Reconnect</a>
                         <form @submit.prevent="disconnect">
                             <button type="submit" class="disconnect-btn">Disconnect</button>
                         </form>
@@ -58,24 +58,24 @@
                 </div>
             </div>
 
-            <!-- ─── Option 2: Direct API Keys ─────────────────────────── -->
+            <!--  Option 2: Direct API Keys  -->
             <div class="option-card" :class="{ active: mode === 'direct' }">
                 <div class="option-head">
                     <div class="option-num">Option 2</div>
                     <div class="option-badge direct">Direct Keys</div>
                 </div>
                 <div class="option-body">
-                    <h2 class="option-title">Your Own Stripe Keys <span class="option-subtitle">— Direct Integration</span></h2>
+                    <h2 class="option-title">Your Own Stripe Keys <span class="option-subtitle">(Direct Integration)</span></h2>
                     <p class="option-desc">
                         Paste your own Stripe API keys. Payments go directly into your Stripe account with <strong>no platform fee</strong>.
                         You manage payouts, disputes, and refunds in your own Stripe dashboard.
                     </p>
 
                     <div class="connect-benefits">
-                        <div class="benefit">✓ Zero platform fee — keep 100% (minus Stripe's fee)</div>
-                        <div class="benefit">✓ Full control in your own Stripe dashboard</div>
-                        <div class="benefit warn">⚠ You manage disputes and refunds directly</div>
-                        <div class="benefit warn">⚠ Switching away removes existing direct keys</div>
+                        <div class="benefit">- Zero platform fee; keep 100% (minus Stripe's fee)</div>
+                        <div class="benefit">- Full control in your own Stripe dashboard</div>
+                        <div class="benefit warn">Note: You manage disputes and refunds directly</div>
+                        <div class="benefit warn">Note: Switching away removes existing direct keys</div>
                     </div>
 
                     <!-- Currently active (direct mode) -->
@@ -90,7 +90,7 @@
                             </div>
                             <div class="key-row">
                                 <span class="key-label">Secret key</span>
-                                <span class="key-val masked">••••••••••••••••</span>
+                                <span class="key-val masked">****************</span>
                             </div>
                         </div>
                         <button class="remove-keys-btn" @click="showDirectForm = true" v-if="!showDirectForm">Update Keys</button>
@@ -125,7 +125,7 @@
                         <div class="field-group">
                             <label class="field-label">
                                 Secret Key
-                                <span class="hint">starts with sk_live_ or sk_test_ — never share this</span>
+                                <span class="hint">starts with sk_live_ or sk_test_ - never share this</span>
                             </label>
                             <div class="secret-wrap">
                                 <input
@@ -138,7 +138,7 @@
                                     spellcheck="false"
                                 />
                                 <button type="button" class="eye-btn" @click="showSecret = !showSecret">
-                                    {{ showSecret ? '🙈' : '👁' }}
+                                    {{ showSecret ? 'Hide' : 'Show' }}
                                 </button>
                             </div>
                             <div class="field-error" v-if="directErrors.secret_key">{{ directErrors.secret_key }}</div>
@@ -146,7 +146,7 @@
 
                         <div class="key-help">
                             <a href="https://dashboard.stripe.com/apikeys" target="_blank" rel="noopener" class="help-link">
-                                Find your API keys in the Stripe Dashboard →
+                                Find your API keys in the Stripe Dashboard ->
                             </a>
                         </div>
 
@@ -158,13 +158,13 @@
                         </div>
 
                         <div class="security-note">
-                            🔒 Your secret key is encrypted before being stored and is never displayed again after saving.
+                            Secure: Your secret key is encrypted before being stored and is never displayed again after saving.
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- ─── How payouts work ───────────────────────────────────── -->
+            <!--  How payouts work  -->
             <div class="info-card">
                 <h3 class="info-title">How Payments Work</h3>
                 <div class="info-grid">
@@ -199,12 +199,12 @@
 import { ref, computed } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import AdminLayout from '../../../components/Admin/Layout.vue'
-import axios from 'axios'
 
 const props = defineProps({
     connectId:    String,
     connectActive: Boolean,
     connectUrl:   String,
+    disconnectUrl: String,
     directPubKey: String,
     directSecSet: Boolean,
     mode:         String,     // 'connect' | 'direct' | 'none'
@@ -231,12 +231,12 @@ const bannerClass = computed(() => ({
     'none':    props.mode === 'none'    ? 'red'   : '',
 }[props.mode] || 'red'))
 
-const bannerIcon = computed(() => ({ connect: '✓', direct: '✓', none: '⚠' }[props.mode] || '⚠'))
+const bannerIcon = computed(() => ({ connect: 'OK', direct: 'OK', none: '!' }[props.mode] || '!'))
 
 const bannerTitle = computed(() => ({
-    connect: 'Stripe Connect is active — payments are being collected.',
-    direct:  'Direct Stripe keys active — payments go to your account.',
-    none:    'No payment method configured — orders cannot be completed.',
+    connect: 'Stripe Connect is active - payments are being collected.',
+    direct:  'Direct Stripe keys active - payments go to your account.',
+    none:    'No payment method configured - orders cannot be completed.',
 }[props.mode] || ''))
 
 const bannerSub = computed(() => ({
@@ -265,7 +265,7 @@ function removeKeys() {
 
 function disconnect() {
     if (!confirm('Disconnect your Stripe account? You will not be able to accept payments until you reconnect.')) return
-    router.post(route('platform.stripe.disconnect'))
+    router.post(props.disconnectUrl)
 }
 </script>
 

@@ -37,6 +37,6 @@ class TenantController extends Controller
     public function impersonate(Tenant $tenant)
     {
         session(['impersonating_tenant' => $tenant->id]);
-        return redirect()->route('dashboard.index');
+        return redirect()->route('platform.dashboard');
     }
 }

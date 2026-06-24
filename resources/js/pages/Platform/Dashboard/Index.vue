@@ -7,6 +7,7 @@ const props = defineProps({
   tenant: Object,
   stats: Object,
   tenantUrl: String,
+  tenantAdminUrl: String,
 })
 
 // Safe defaults so the page doesn't break
@@ -18,6 +19,7 @@ const stats = computed(() => props.stats || {
 })
 
 const tenantUrl = computed(() => props.tenantUrl || '#')
+const tenantAdminUrl = computed(() => props.tenantAdminUrl || '#')
 </script>
 
 <template>
@@ -27,7 +29,7 @@ const tenantUrl = computed(() => props.tenantUrl || '#')
       <div class="flex items-center gap-4">
         <h1 class="text-2xl font-bold">SimpleOrder</h1>
         <nav class="flex gap-4">
-          <Link :href="route('dashboard.index')" class="text-gray-600 hover:text-black">Dashboard</Link>
+          <Link :href="route('platform.dashboard')" class="text-gray-600 hover:text-black">Dashboard</Link>
           <Link :href="route('platform.billing.index')" class="text-gray-600 hover:text-black">Billing</Link>
           <a v-if="tenantUrl" :href="tenantUrl" target="_blank" class="text-gray-600 hover:text-black">View Store</a>
         </nav>
@@ -35,7 +37,7 @@ const tenantUrl = computed(() => props.tenantUrl || '#')
 
       <div class="flex items-center gap-4">
         <span>{{ user?.name }}</span>
-        <form method="POST" :action="route('logout')">
+        <form method="POST" :action="route('platform.logout')">
           <button type="submit" class="text-red-600 hover:underline">Logout</button>
         </form>
       </div>
@@ -76,7 +78,7 @@ const tenantUrl = computed(() => props.tenantUrl || '#')
       <div class="bg-white rounded-xl shadow p-6">
         <h3 class="font-semibold mb-4">Quick Actions</h3>
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <a :href="route('tenant.admin.dashboard')" class="p-4 border rounded-lg hover:bg-gray-50">
+          <a :href="tenantAdminUrl" class="p-4 border rounded-lg hover:bg-gray-50">
             Go to Admin Panel
           </a>
           <!-- Add more links as needed -->

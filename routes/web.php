@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Platform;
 
-// ─── Platform (central domain) ──────────────────────────────────────────────
+// Platform central domain
 // Public marketing + signup + login
 
 Route::get('/', [Platform\MarketingController::class, 'home'])->name('home');
@@ -17,20 +17,20 @@ Route::middleware('guest:platform')->group(function () {
     Route::post('/register', [Platform\AuthController::class, 'register'])->name('register.post');
 });
 
-Route::post('/logout', [Platform\AuthController::class, 'logout'])->name('logout')->middleware('auth:platform');
+Route::post('/logout', [Platform\AuthController::class, 'logout'])->name('platform.logout')->middleware('auth:platform');
 
 // Stripe Connect OAuth callback
 Route::get('/platform/stripe/callback', [Platform\StripeConnectController::class, 'callback'])
-    ->name('stripe.connect.callback')->middleware('auth:platform');
+    ->name('platform.stripe.callback')->middleware('auth:platform');
 
-// Tenant dashboard (after login) — billing, settings, Stripe Connect
-Route::prefix('dashboard')->name('dashboard.')->middleware(['auth:platform', 'tenant.active'])->group(function () {
-    Route::get('/', [Platform\DashboardController::class, 'index'])->name('index');
-    Route::get('/billing', [Platform\BillingController::class, 'index'])->name('billing');
+// Tenant dashboard after login: billing, settings, Stripe Connect
+Route::prefix('dashboard')->name('platform.')->middleware(['auth:platform', 'tenant.active'])->group(function () {
+    Route::get('/', [Platform\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/billing', [Platform\BillingController::class, 'index'])->name('billing.index');
     Route::post('/billing/subscribe', [Platform\BillingController::class, 'subscribe'])->name('billing.subscribe');
     Route::post('/billing/cancel', [Platform\BillingController::class, 'cancel'])->name('billing.cancel');
     Route::get('/billing/portal', [Platform\BillingController::class, 'portal'])->name('billing.portal');
-    Route::get('/stripe/connect', [Platform\StripeConnectController::class, 'redirect'])->name('stripe.connect');
+    Route::get('/stripe/connect', [Platform\StripeConnectController::class, 'redirect'])->name('stripe.redirect');
     Route::post('/stripe/disconnect', [Platform\StripeConnectController::class, 'disconnect'])->name('stripe.disconnect');
 });
 

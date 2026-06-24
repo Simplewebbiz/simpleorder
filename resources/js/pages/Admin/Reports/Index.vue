@@ -92,11 +92,11 @@ const topItems = computed(() => props.top_items || [])
 const fmt = (n) => Number(n || 0).toFixed(2)
 
 function reload() {
-    router.get(route('admin.reports.index'), filters.value, { preserveState: true, replace: true })
+    router.get(route('tenant.admin.reports.index'), filters.value, { preserveState: true, replace: true })
 }
 
 function exportCsv() {
-    window.location = route('admin.reports.export') + '?' + new URLSearchParams(filters.value).toString()
+    window.location = route('tenant.admin.reports.export') + '?' + new URLSearchParams(filters.value).toString()
 }
 
 const chartData = computed(() => ({

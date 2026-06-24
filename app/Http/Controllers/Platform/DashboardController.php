@@ -13,33 +13,32 @@ class DashboardController extends Controller
         $user = Auth::guard('platform')->user();
         $tenant = $user->tenant;
 
-        // Generate tenant storefront URL
-        $tenantUrl = $tenant 
-            ? 'https://' . $tenant->slug . '.simpleorder.com' 
-            : null;
+        $tenantUrl = $tenant ? $this->tenantUrl($tenant) : null;
 
-        // Basic stats (you can expand this later)
         $stats = [
-            'total_orders'     => 0,
-            'total_revenue'    => 0,
-            'menu_items'       => 0,
-            'is_stripe_connected' => false,
+            'total_orders' => 0,
+            'total_revenue' => 0,
+            'menu_items' => 0,
+            'is_stripe_connected' => (bool) ($tenant?->stripe_connect_active),
         ];
 
-        // TODO: Calculate real stats here when you have the relationships set up
-        // Example (uncomment when ready):
-        // if ($tenant) {
-        //     $stats['total_orders'] = $tenant->orders()->count();
-        //     $stats['total_revenue'] = $tenant->orders()->sum('total');
-        //     $stats['menu_items'] = $tenant->items()->count();
-        //     $stats['is_stripe_connected'] = !empty($tenant->stripe_account_id);
-        // }
-
         return Inertia::render('Platform/Dashboard/Index', [
-            'user'       => $user,
-            'tenant'     => $tenant,
-            'stats'      => $stats,
-            'tenantUrl'  => $tenantUrl,
+            'user' => $user,
+            'tenant' => $tenant,
+            'stats' => $stats,
+            'tenantUrl' => $tenantUrl,
+            'tenantAdminUrl' => $tenantUrl ? $tenantUrl . '/admin' : null,
         ]);
+    }
+
+    private function tenantUrl($tenant): string
+    {
+        $domain = $tenant->domains()->where('is_primary', true)->value('domain')
+            ?: $tenant->domains()->value('domain')
+            ?: $tenant->id . '.' . parse_url(config('app.url'), PHP_URL_HOST);
+
+        $scheme = parse_url(config('app.url'), PHP_URL_SCHEME) ?: 'https';
+
+        return $scheme . '://' . $domain;
     }
 }

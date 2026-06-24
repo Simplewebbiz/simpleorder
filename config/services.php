@@ -29,6 +29,10 @@ return [
         'key' => env('GOOGLE_MAPS_API_KEY'),
     ],
 
+
+    'stripe' => [
+        'client_id' => env('STRIPE_CLIENT_ID'),
+    ],
     'twilio' => [
         'enabled' => env('TWILIO_ENABLED', false),
         'sid'     => env('TWILIO_SID'),

@@ -35,7 +35,7 @@ class WebhookController extends Controller
 
     private function handleSubscriptionUpdated(object $subscription): void
     {
-        $tenant = Tenant::where('stripe_customer_id', $subscription->customer)->first();
+        $tenant = Tenant::where('stripe_id', $subscription->customer)->orWhere('stripe_customer_id', $subscription->customer)->first();
         if (!$tenant) return;
 
         $tenant->update([
@@ -60,7 +60,7 @@ class WebhookController extends Controller
 
     private function handlePaymentFailed(object $invoice): void
     {
-        $tenant = Tenant::where('stripe_customer_id', $invoice->customer)->first();
+        $tenant = Tenant::where('stripe_id', $invoice->customer)->orWhere('stripe_customer_id', $invoice->customer)->first();
         if (!$tenant) return;
 
         $tenant->update(['subscription_status' => 'past_due']);
@@ -77,7 +77,7 @@ class WebhookController extends Controller
 
     private function handlePaymentSucceeded(object $invoice): void
     {
-        $tenant = Tenant::where('stripe_customer_id', $invoice->customer)->first();
+        $tenant = Tenant::where('stripe_id', $invoice->customer)->orWhere('stripe_customer_id', $invoice->customer)->first();
         if (!$tenant) return;
 
         if ($tenant->subscription_status === 'past_due') {

@@ -13,8 +13,8 @@
 
             <!-- Stripe billing portal link (manage payment method, view invoices) -->
             <div class="portal-section">
-                <a :href="route('dashboard.billing.portal')" class="btn-portal">
-                    Manage Payment Method &amp; Invoices →
+                <a :href="route('platform.billing.portal')" class="btn-portal">
+                    Manage Payment Method &amp; Invoices
                 </a>
                 <p class="portal-help">Update your card, download invoices, and manage your subscription from the Stripe billing portal.</p>
             </div>
@@ -112,7 +112,7 @@ function openSubscribeModal(plan) {
 
 function confirmCancel() {
     if (confirm('Are you sure you want to cancel? You will retain access until the end of your billing period.')) {
-        router.post(route('dashboard.billing.cancel'))
+        router.post(route('platform.billing.cancel'))
     }
 }
 </script>

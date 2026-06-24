@@ -11,16 +11,10 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 Route::middleware([
     PreventAccessFromCentralDomains::class,
     InitializeTenancyByDomain::class,
-])->group(function () {
+])->name('tenant.')->group(function () {
 
-    // ─── Customer-facing ordering app ────────────────────────────────────
+    // Customer-facing ordering endpoints
     Route::middleware(['tenant.subscription'])->group(function () {
-
-        // SPA catch-all — Vue handles routing client-side
-        Route::get('/{path?}', [Tenant\StorefrontController::class, 'index'])
-            ->where('path', '.*')
-            ->name('storefront');
-
         // Ordering API endpoints
         Route::prefix('ordering')->name('ordering.')->group(function () {
             // Cart
@@ -47,7 +41,7 @@ Route::middleware([
         Route::get('/tenant-media/{file}', [Tenant\MediaController::class, 'serve'])->name('media.serve');
     });
 
-    // ─── Tenant Admin Panel ───────────────────────────────────────────────
+    // Tenant Admin Panel
     Route::prefix('admin')->name('admin.')->middleware(['auth:tenant', 'tenant.admin'])->group(function () {
 
         Route::get('/', [Tenant\Admin\DashboardController::class, 'index'])->name('dashboard');
@@ -55,9 +49,9 @@ Route::middleware([
         // Orders
         Route::prefix('orders')->name('orders.')->group(function () {
             Route::get('/', [Tenant\Admin\OrderController::class, 'index'])->name('index');
+            Route::get('/reports/export', [Tenant\Admin\ReportController::class, 'export'])->name('reports.export');
             Route::get('/{order}', [Tenant\Admin\OrderController::class, 'show'])->name('show');
             Route::patch('/{order}/status', [Tenant\Admin\OrderController::class, 'updateStatus'])->name('status');
-            Route::get('/reports/export', [Tenant\Admin\ReportController::class, 'export'])->name('reports.export');
         });
 
         // Reports
@@ -93,4 +87,10 @@ Route::middleware([
         Route::post('/login', [Tenant\Admin\AuthController::class, 'login'])->name('login.post');
         Route::post('/logout', [Tenant\Admin\AuthController::class, 'logout'])->name('logout')->middleware('auth:tenant');
     });
+
+    // Storefront SPA fallback. Keep this after admin routes so /admin/* is not swallowed.
+    Route::middleware(['tenant.subscription'])
+        ->get('/{path?}', [Tenant\StorefrontController::class, 'index'])
+        ->where('path', '.*')
+        ->name('storefront');
 });

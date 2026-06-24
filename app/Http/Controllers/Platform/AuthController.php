@@ -35,7 +35,7 @@ class AuthController extends Controller
             return redirect()->route('platform.superadmin.index');
         }
 
-        return redirect()->route('dashboard.index');
+        return redirect()->route('platform.dashboard');
     }
 
     public function showRegister()
@@ -54,14 +54,6 @@ class AuthController extends Controller
             'password'     => 'required|min:8|confirmed',
             'plan_id'      => 'required|exists:plans,id',
         ]);
-
-        // Create platform admin user
-        $admin = PlatformAdmin::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
-
         // Create tenant
         $tenant = Tenant::create([
             'id'        => $data['subdomain'],
@@ -69,6 +61,14 @@ class AuthController extends Controller
             'plan_id'   => $data['plan_id'],
             'subscription_status' => 'trialing',
             'trial_ends_at' => now()->addDays(14),
+        ]);
+
+        // Create platform admin user linked to this tenant.
+        $admin = PlatformAdmin::create([
+            'tenant_id' => $tenant->id,
+            'name'      => $data['name'],
+            'email'     => $data['email'],
+            'password'  => Hash::make($data['password']),
         ]);
 
         // Attach subdomain
@@ -100,7 +100,7 @@ class AuthController extends Controller
 
         Auth::guard('platform')->login($admin);
 
-        return redirect()->route('dashboard.billing');
+        return redirect()->route('platform.billing.index');
     }
 
     public function logout(Request $request)

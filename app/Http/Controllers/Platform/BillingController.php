@@ -46,11 +46,14 @@ class BillingController extends Controller
             : $plan->stripe_monthly_price_id;
 
         try {
-            $tenant->newSubscription('default', $priceId)
+            $subscription = $tenant->newSubscription('default', $priceId)
                 ->create($request->payment_method);
 
+            $tenant->refresh();
             $tenant->update([
-                'plan_id'             => $plan->id,
+                'plan_id' => $plan->id,
+                'stripe_customer_id' => $tenant->stripe_id,
+                'stripe_subscription_id' => $subscription->stripe_id,
                 'subscription_status' => 'active',
             ]);
 
@@ -73,7 +76,7 @@ class BillingController extends Controller
     {
         $tenant = auth('platform')->user()->tenant;
 
-        return redirect($tenant->billingPortalUrl(route('dashboard.billing')));
+        return redirect($tenant->billingPortalUrl(route('platform.billing.index')));
     }
 
     private function getUpcomingInvoice($tenant): ?array

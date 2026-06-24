@@ -12,7 +12,7 @@ class RequireTenantAdmin
         $user = auth('tenant')->user();
 
         if (!$user || $user->isCustomer()) {
-            return redirect()->route('admin.login');
+            return redirect()->route('tenant.admin.login');
         }
 
         return $next($request);

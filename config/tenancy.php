@@ -11,10 +11,10 @@ return [
 
     'domain_model' => Domain::class,
 
-    'central_domains' => [
-        'simpleorder.biz',
-        'www.simpleorder.biz',
-    ],
+    'central_domains' => array_filter(array_map('trim', explode(',', env(
+        'CENTRAL_DOMAINS',
+        parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST) ?: 'localhost'
+    )))),
 
     'bootstrappers' => [
         Stancl\Tenancy\Bootstrappers\DatabaseTenancyBootstrapper::class,

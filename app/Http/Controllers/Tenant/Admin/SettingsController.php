@@ -56,7 +56,7 @@ class SettingsController extends Controller
     {
         return Inertia::render('Admin/Settings/Stripe', [
             'stripeConnected' => !empty(Setting::get('stripe_connect_id')),
-            'connectUrl'      => route('dashboard.stripe.connect'),
+            'connectUrl'      => rtrim(config('app.url'), '/') . '/dashboard/stripe/connect',
         ]);
     }
 }

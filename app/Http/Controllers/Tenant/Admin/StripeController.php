@@ -30,9 +30,10 @@ class StripeController extends Controller
         return Inertia::render('Admin/Stripe/Index', [
             'connectId'    => $connectId,
             'connectActive'=> (bool) $tenant->stripe_connect_active,
-            'connectUrl'   => route('platform.stripe.redirect'),
+            'connectUrl'   => rtrim(config('app.url'), '/') . '/dashboard/stripe/connect',
+            'disconnectUrl'=> rtrim(config('app.url'), '/') . '/dashboard/stripe/disconnect',
             'directPubKey' => $directPubKey,
-            // Never send the secret to the frontend — just whether it's set
+            // Never send the secret to the frontend  just whether it's set
             'directSecSet' => ! empty($directSecKey),
             'mode'         => $mode,
             'platformFee'  => config('stripe.platform_fee', 0.02),
@@ -57,7 +58,7 @@ class StripeController extends Controller
         } catch (\Stripe\Exception\AuthenticationException $e) {
             return back()->withErrors(['secret_key' => 'Invalid Stripe secret key. Please check and try again.']);
         } catch (\Throwable $e) {
-            // Network or other error — allow save but warn
+            // Network or other error  allow save but warn
         }
 
         Setting::set('stripe_publishable_key', $request->publishable_key);

@@ -12,7 +12,7 @@
                 <Link :href="route('platform.superadmin.plans.index')" class="sa-link">Plans</Link>
                 <Link :href="route('platform.superadmin.settings')" class="sa-link">Settings</Link>
             </nav>
-            <Link :href="route('logout')" method="post" as="button" class="sa-logout">Logout</Link>
+            <Link :href="route('platform.logout')" method="post" as="button" class="sa-logout">Logout</Link>
         </header>
 
         <main class="sa-main">
