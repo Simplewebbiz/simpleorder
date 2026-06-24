@@ -1,50 +1,50 @@
 <template>
     <div class="storefront-home">
-        <!-- Hero -->
         <section class="hero" :style="heroStyle">
-            <div class="hero-overlay">
-                <div class="hero-content">
-                    <div class="hero-logo-wrap" v-if="brand.logo">
-                        <img :src="brand.logo" :alt="brand.name" class="hero-logo" />
+            <div class="hero-content">
+                <div class="hero-copy">
+                    <p class="eyebrow">Fresh online ordering</p>
+                    <h1>{{ brand.name || settings.store_name || 'Order Online' }}</h1>
+                    <p class="hero-sub" v-if="storeOpen">{{ page?.summary || 'Fresh food, easy ordering, pickup and delivery from our kitchen to your table.' }}</p>
+                    <p class="hero-sub closed" v-else>We are currently closed. Check back during our regular hours.</p>
+                    <div class="hero-actions">
+                        <button v-if="storeOpen" class="hero-cta" @click="startOrder">Order Now</button>
+                        <a href="/menu" class="hero-secondary" @click.prevent="startOrder">View Menu</a>
                     </div>
-                    <h1 class="hero-title">{{ brand.name || 'Order Online' }}</h1>
-                    <p class="hero-sub" v-if="storeOpen">Fresh &amp; made to order — pickup or delivery</p>
-                    <p class="hero-sub closed" v-else>We're currently closed. Check back during our hours!</p>
-                    <button v-if="storeOpen" class="hero-cta" @click="startOrder">
-                        Order Now
-                    </button>
+                </div>
+                <div class="hero-card">
+                    <div class="dish-card top-card">
+                        <span>Pickup</span>
+                        <strong v-if="settings.allow_pickup">Available today</strong>
+                        <strong v-else>Unavailable</strong>
+                    </div>
+                    <div class="dish-card bottom-card">
+                        <span>Delivery</span>
+                        <strong v-if="settings.allow_delivery">Fresh to your door</strong>
+                        <strong v-else>Pickup only</strong>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Status bar -->
-        <div class="status-bar" v-if="storeOpen && (settings.allow_pickup || settings.allow_delivery)">
-            <div class="status-pill pickup" v-if="settings.allow_pickup">🏪 Pickup Available</div>
-            <div class="status-pill delivery" v-if="settings.allow_delivery">🚗 Delivery Available</div>
-        </div>
+        <section v-if="page?.content" class="intro-section">
+            <div class="content-wrap" v-html="page.content"></div>
+        </section>
 
-        <!-- Category grid -->
         <section class="categories-section">
             <div class="container">
-                <h2 class="section-title">Browse Our Menu</h2>
+                <div class="section-header">
+                    <p class="eyebrow">Menu</p>
+                    <h2>Browse our favorites</h2>
+                </div>
                 <div class="categories-grid">
-                    <button
-                        v-for="cat in menu"
-                        :key="cat.id"
-                        class="category-card"
-                        @click="$emit('browse', cat)"
-                    >
-                        <div
-                            class="category-image"
-                            :style="cat.image ? { backgroundImage: 'url(' + cat.image.url + ')' } : {}"
-                        >
-                            <div class="category-image-fallback" v-if="!cat.image">
-                                {{ cat.name.charAt(0) }}
-                            </div>
+                    <button v-for="cat in menu" :key="cat.id" class="category-card" @click="$emit('browse', cat)">
+                        <div class="category-image" :style="cat.image ? { backgroundImage: 'url(' + cat.image.permalink + ')' } : {}">
+                            <div class="category-image-fallback" v-if="!cat.image">{{ cat.name.charAt(0) }}</div>
                         </div>
                         <div class="category-info">
                             <h3>{{ cat.name }}</h3>
-                            <p v-if="cat.description" v-html="stripTags(cat.description)"></p>
+                            <p v-if="cat.description">{{ stripTags(cat.description) }}</p>
                             <span class="item-count">{{ cat.items ? cat.items.length : 0 }} items</span>
                         </div>
                     </button>
@@ -57,63 +57,76 @@
 <script setup>
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
-import { useCartStore, isStoreOpen } from '../../stores/cart'
+import { isStoreOpen } from '../../stores/cart'
 
 const props = defineProps({
     menu: Array,
     settings: Object,
+    page: Object,
 })
 
 const emit = defineEmits(['browse'])
-const cart = useCartStore()
-const page = usePage()
-const brand = page.props.tenant_brand || {}
+const inertiaPage = usePage()
+const brand = inertiaPage.props.tenant_brand || {}
 const storeOpen = computed(() => isStoreOpen(props.settings))
 
 const heroStyle = computed(() => {
-    const firstCatWithImage = props.menu?.find(c => c.image)
-    if (firstCatWithImage?.image?.url) {
-        return { backgroundImage: `url(${firstCatWithImage.image.url})` }
+    if (props.page?.hero?.permalink) {
+        return { backgroundImage: `linear-gradient(90deg, rgba(255,247,237,.96), rgba(255,247,237,.8)), url(${props.page.hero.permalink})` }
     }
+
+    const firstCatWithImage = props.menu?.find(c => c.image)
+    if (firstCatWithImage?.image?.permalink) {
+        return { backgroundImage: `linear-gradient(90deg, rgba(255,247,237,.96), rgba(255,247,237,.78)), url(${firstCatWithImage.image.permalink})` }
+    }
+
     return {}
 })
 
 function startOrder() {
-    if (props.menu?.length) {
-        emit('browse', props.menu[0])
-    }
+    if (props.menu?.length) emit('browse', props.menu[0])
 }
 
 function stripTags(html) {
     if (!html) return ''
-    return html.replace(/<[^>]*>/g, '').substring(0, 80) + (html.length > 80 ? '…' : '')
+    const text = html.replace(/<[^>]*>/g, '')
+    return text.substring(0, 90) + (text.length > 90 ? '...' : '')
 }
 </script>
 
 <style scoped>
-.hero { min-height: 420px; background: #1a1a1a center/cover no-repeat; position: relative; display: flex; align-items: center; }
-.hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,.55), rgba(0,0,0,.75)); display: flex; align-items: center; justify-content: center; }
-.hero-content { text-align: center; color: #fff; padding: 40px 20px; }
-.hero-logo { max-height: 80px; max-width: 280px; object-fit: contain; margin-bottom: 16px; }
-.hero-title { font-size: clamp(28px, 5vw, 52px); font-weight: 800; margin-bottom: 10px; letter-spacing: -0.02em; }
-.hero-sub { font-size: 16px; color: rgba(255,255,255,.75); margin-bottom: 28px; }
-.hero-sub.closed { color: #fca5a5; }
-.hero-cta { background: #e85d04; color: #fff; border: none; padding: 16px 40px; font-size: 17px; font-weight: 700; border-radius: 8px; cursor: pointer; transition: background 0.15s; }
-.hero-cta:hover { background: #c44d03; }
-.status-bar { display: flex; justify-content: center; gap: 12px; padding: 12px 20px; background: #f9fafb; border-bottom: 1px solid #e5e7eb; flex-wrap: wrap; }
-.status-pill { background: #fff; border: 1px solid #e5e7eb; border-radius: 20px; padding: 6px 16px; font-size: 13px; font-weight: 600; color: #374151; }
-.status-pill.pickup { border-color: #22c55e; color: #15803d; }
-.status-pill.delivery { border-color: #3b82f6; color: #1d4ed8; }
-.categories-section { padding: 48px 0; }
-.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-.section-title { font-size: 24px; font-weight: 800; margin-bottom: 28px; color: #1a1a1a; }
-.categories-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
-.category-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; text-align: left; cursor: pointer; transition: all 0.2s; padding: 0; }
-.category-card:hover { border-color: #e85d04; box-shadow: 0 4px 20px rgba(232,93,4,.15); transform: translateY(-2px); }
-.category-image { height: 160px; background: #f3f4f6 center/cover no-repeat; display: flex; align-items: center; justify-content: center; }
-.category-image-fallback { font-size: 48px; font-weight: 800; color: #d1d5db; }
+.hero { min-height: 520px; background: linear-gradient(135deg, #fff7ed, #ccfbf1); background-size: cover; background-position: center; display: flex; align-items: center; }
+.hero-content { max-width: 1180px; width: 100%; margin: 0 auto; padding: 70px 22px; display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 40px; align-items: center; }
+.eyebrow { color: #0f766e; font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 12px; }
+h1 { color: #17272b; font-size: 58px; line-height: 1.02; font-weight: 900; max-width: 720px; }
+.hero-sub { color: #405257; font-size: 20px; line-height: 1.6; max-width: 650px; margin-top: 20px; }
+.hero-sub.closed { color: #be123c; }
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; }
+.hero-cta, .hero-secondary { border-radius: 8px; padding: 14px 22px; font-size: 15px; font-weight: 900; text-decoration: none; cursor: pointer; }
+.hero-cta { background: #ff7a59; color: #fff; border: none; }
+.hero-secondary { background: #fff; color: #0f766e; border: 1px solid #b7ded7; }
+.hero-card { position: relative; min-height: 260px; }
+.dish-card { position: absolute; width: 250px; min-height: 120px; background: rgba(255,255,255,.88); border: 1px solid rgba(255,255,255,.8); box-shadow: 0 24px 50px rgba(31,45,48,.16); border-radius: 8px; padding: 22px; display: flex; flex-direction: column; justify-content: end; }
+.dish-card span { color: #ef6c3e; font-weight: 900; font-size: 13px; text-transform: uppercase; }
+.dish-card strong { color: #17272b; font-size: 23px; line-height: 1.1; margin-top: 8px; }
+.top-card { right: 70px; top: 5px; }
+.bottom-card { right: 0; bottom: 0; background: rgba(236,253,245,.92); }
+.intro-section { padding: 48px 22px 20px; background: #fff; }
+.content-wrap { max-width: 820px; margin: 0 auto; color: #344448; font-size: 17px; line-height: 1.75; }
+.content-wrap :deep(h2) { color: #17272b; font-size: 30px; margin-bottom: 12px; }
+.content-wrap :deep(img) { max-width: 100%; border-radius: 8px; margin: 18px 0; }
+.categories-section { padding: 56px 0 70px; background: #fbfdfc; }
+.container { max-width: 1180px; margin: 0 auto; padding: 0 22px; }
+.section-header { margin-bottom: 24px; }
+.section-header h2 { color: #17272b; font-size: 32px; font-weight: 900; }
+.categories-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+.category-card { background: #fff; border: 1px solid #e5edf0; border-radius: 8px; overflow: hidden; text-align: left; cursor: pointer; transition: all .2s; padding: 0; box-shadow: 0 10px 24px rgba(31,45,48,.06); }
+.category-card:hover { border-color: #ffb199; transform: translateY(-2px); box-shadow: 0 18px 34px rgba(31,45,48,.1); }
+.category-image { height: 160px; background: linear-gradient(135deg, #fed7aa, #99f6e4); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; }
+.category-image-fallback { font-size: 48px; font-weight: 900; color: rgba(255,255,255,.92); }
 .category-info { padding: 16px; }
-.category-info h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
-.category-info p { font-size: 13px; color: #6b7280; margin-bottom: 8px; line-height: 1.4; }
-.item-count { font-size: 12px; color: #e85d04; font-weight: 600; }
+.category-info h3 { color: #17272b; font-size: 18px; font-weight: 900; margin-bottom: 6px; }
+.category-info p { color: #657477; font-size: 13px; margin-bottom: 10px; line-height: 1.5; }
+.item-count { color: #0f766e; font-size: 12px; font-weight: 900; }
+@media (max-width: 860px) { .hero-content { grid-template-columns: 1fr; } .hero-card { display: none; } h1 { font-size: 40px; } }
 </style>

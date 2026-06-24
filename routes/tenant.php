@@ -38,7 +38,7 @@ Route::middleware([
         });
 
         // Media
-        Route::get('/tenant-media/{file}', [Tenant\MediaController::class, 'serve'])->name('media.serve');
+        Route::get('/tenant-media/{file}', [Tenant\MediaController::class, 'serve'])->where('file', '.*')->name('media.serve');
     });
 
     // Tenant Admin Panel
@@ -63,6 +63,7 @@ Route::middleware([
         // Menu
         Route::resource('categories', Tenant\Admin\CategoryController::class);
         Route::resource('items', Tenant\Admin\ItemController::class);
+        Route::resource('pages', Tenant\Admin\PageController::class)->only(['index', 'edit', 'update']);
         Route::post('/items/{item}/options', [Tenant\Admin\ItemController::class, 'saveOptions'])->name('items.options');
 
         // Users / Staff

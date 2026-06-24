@@ -15,14 +15,17 @@ class MediaController extends Controller
     public function index()
     {
         return Inertia::render('Admin/Media/Index', [
-            'media'   => Media::orderByDesc('created_at')->get()->map(fn($m) => [
-                'id'          => $m->id,
-                'name'        => $m->name,
-                'alt'         => $m->alt,
-                'url'         => $m->permalink,
-                'mime'        => $m->mime,
-                'size'        => $m->size,
-                'created_at'  => $m->created_at->toDateString(),
+            'media' => Media::orderByDesc('created_at')->get()->map(fn ($media) => [
+                'id' => $media->id,
+                'name' => $media->name,
+                'alt' => $media->alt,
+                'src' => $media->src,
+                'folder' => $media->folder,
+                'permalink' => $media->permalink,
+                'url' => $media->permalink,
+                'mime' => $media->mime,
+                'size' => $media->size,
+                'created_at' => $media->created_at->toDateString(),
             ]),
             'logo_url' => Setting::get('logo_url'),
         ]);
@@ -31,42 +34,42 @@ class MediaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'file'   => 'required|file|mimes:jpeg,png,gif,webp,svg|max:5120',
-            'alt'    => 'nullable|string|max:200',
-            'folder' => 'nullable|string|in:general,logos,items,categories',
+            'file' => 'required|file|mimes:jpeg,jpg,png,gif,webp,svg|max:5120',
+            'alt' => 'nullable|string|max:200',
+            'folder' => 'nullable|string|in:general,logos,items,categories,pages',
         ]);
 
-        $file   = $request->file('file');
+        $file = $request->file('file');
         $folder = $request->input('folder', 'general');
-        $ext    = $file->getClientOriginalExtension();
-        $name   = Str::uuid() . '.' . $ext;
+        $ext = strtolower($file->getClientOriginalExtension());
+        $name = Str::uuid() . '.' . $ext;
+        $path = 'media/' . $folder . '/' . $name;
 
-        // Resize images > 2000px wide to keep file sizes sane
-        if (in_array($ext, ['jpeg', 'jpg', 'png', 'webp', 'gif'])) {
+        if (in_array($ext, ['jpeg', 'jpg', 'png', 'webp', 'gif'], true)) {
             $image = Image::read($file)->scaleDown(width: 2000);
-            Storage::disk('public')->put('media/' . $folder . '/' . $name, (string) $image->encode());
+            Storage::disk('public')->put($path, (string) $image->encode());
         } else {
             Storage::disk('public')->putFileAs('media/' . $folder, $file, $name);
         }
 
         $media = Media::create([
-            'name'   => $file->getClientOriginalName(),
-            'alt'    => $request->input('alt', ''),
-            'src'    => 'media/' . $folder . '/' . $name,
-            'mime'   => $file->getMimeType(),
-            'size'   => $file->getSize(),
+            'name' => $file->getClientOriginalName(),
+            'alt' => $request->input('alt', ''),
+            'src' => $path,
+            'mime' => $file->getMimeType(),
+            'size' => $file->getSize(),
             'folder' => $folder,
         ]);
 
-        // If this is a logo upload, save as the tenant logo setting
         if ($folder === 'logos') {
             Setting::set('logo_url', $media->permalink);
             Setting::set('logo_media_id', $media->id);
         }
 
         return response()->json([
-            'id'   => $media->id,
-            'url'  => $media->permalink,
+            'id' => $media->id,
+            'url' => $media->permalink,
+            'permalink' => $media->permalink,
             'name' => $media->name,
         ]);
     }
@@ -75,7 +78,6 @@ class MediaController extends Controller
     {
         Storage::disk('public')->delete($media->src);
 
-        // Clear logo setting if this was the logo
         if (Setting::get('logo_media_id') == $media->id) {
             Setting::set('logo_url', null);
             Setting::set('logo_media_id', null);
@@ -84,13 +86,5 @@ class MediaController extends Controller
         $media->delete();
 
         return back()->with('success', 'File deleted.');
-    }
-
-    // Serve tenant media files
-    public function serve(string $file)
-    {
-        $path = storage_path('app/public/media/' . $file);
-        if (!file_exists($path)) abort(404);
-        return response()->file($path);
     }
 }

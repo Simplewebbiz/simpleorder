@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
-use App\Models\Tenant\{Category, Cart, Setting};
+use App\Models\Tenant\{Category, Cart, Page, Setting};
 use App\Services\CartService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,8 +12,15 @@ class StorefrontController extends Controller
 {
     public function index(Request $request, CartService $cartService)
     {
+        Page::seedDefaults();
+
         $categories = Category::with(['items.image', 'items.options.values', 'image'])
             ->where('is_active', true)
+            ->orderBy('sort')
+            ->get();
+
+        $pages = Page::with('hero')
+            ->where('is_published', true)
             ->orderBy('sort')
             ->get();
 
@@ -31,21 +38,21 @@ class StorefrontController extends Controller
             'timezone'       => Setting::get('timezone', 'America/Chicago'),
             'allow_pickup'   => Setting::get('allow_pickup', true),
             'allow_delivery' => Setting::get('allow_delivery', true),
-            // Use tenant's own publishable key if set, else platform key
             'stripe_key'     => Setting::get('stripe_publishable_key') ?: config('stripe.key'),
         ];
 
         $tenant = tenant();
 
         return Inertia::render('Storefront/App', [
-            'menu'         => $categories,
-            'cart'         => $cartData,
-            'settings'     => $settings,
-            'tenant'       => [
-                'name'   => $tenant->name,
-                'id'     => $tenant->id,
+            'menu'     => $categories,
+            'pages'    => $pages,
+            'cart'     => $cartData,
+            'settings' => $settings,
+            'tenant'   => [
+                'name' => $tenant->name,
+                'id'   => $tenant->id,
             ],
-            'auth'         => [
+            'auth'     => [
                 'user' => auth('tenant')->user(),
             ],
         ]);
