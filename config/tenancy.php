@@ -37,7 +37,7 @@ return [
         'prefix' => env('TENANCY_DB_PREFIX', 'simpleorder_tenant_'),
         'suffix' => '',
         'managers' => [
-            'mysql' => Stancl\Tenancy\Database\DatabaseManager::class,
+            'mysql' => Stancl\Tenancy\TenantDatabaseManagers\MySQLDatabaseManager::class,
         ],
     ],
 
@@ -48,13 +48,12 @@ return [
     'filesystem' => [
         'suffix_base' => 'tenant',
         'disks' => [
-            'local' => [
-                'root_override' => env('APP_STORAGE_PATH', storage_path('app')) . '/tenant%tenant%/',
-            ],
-            'public' => [
-                'root_override' => env('APP_STORAGE_PATH', storage_path('app')) . '/tenant%tenant%/public/',
-                'url_override' => '/storage/tenant%tenant%',
-            ],
+            'local',
+            'public',
+        ],
+        'root_override' => [
+            'local' => (env('APP_STORAGE_PATH') ?: storage_path('app')) . '/',
+            'public' => (env('APP_STORAGE_PATH') ?: storage_path('app')) . '/public/',
         ],
         'suffix_storage_path' => true,
         'asset_helper_tenancy' => false,
