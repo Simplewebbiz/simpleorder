@@ -46,4 +46,53 @@ class PlatformSetting extends Model
             static::set($key, $value);
         }
     }
+
+    /**
+     * Apply database-backed platform settings to runtime config.
+     */
+    public static function applyToConfig(): void
+    {
+        try {
+            if ($key = static::get('stripe_key', env('STRIPE_KEY'))) {
+                config(['cashier.key' => $key, 'stripe.key' => $key]);
+            }
+
+            if ($secret = static::get('stripe_secret', env('STRIPE_SECRET'))) {
+                config(['cashier.secret' => $secret, 'stripe.secret' => $secret]);
+            }
+
+            if ($webhookSecret = static::get('stripe_webhook_secret', env('STRIPE_WEBHOOK_SECRET'))) {
+                config(['cashier.webhook.secret' => $webhookSecret, 'stripe.webhook_secret' => $webhookSecret]);
+            }
+
+            if ($fee = static::get('stripe_platform_fee', env('STRIPE_PLATFORM_FEE', '0.02'))) {
+                config(['stripe.platform_fee' => (float) $fee]);
+            }
+
+            if ($apiKey = static::get('resend_api_key', env('RESEND_API_KEY'))) {
+                config(['resend.api_key' => $apiKey]);
+            }
+
+            if ($from = static::get('mail_from_address', env('MAIL_FROM_ADDRESS'))) {
+                config(['mail.from.address' => $from]);
+            }
+
+            if ($name = static::get('mail_from_name', env('MAIL_FROM_NAME', 'SimpleOrder'))) {
+                config(['mail.from.name' => $name]);
+            }
+
+            if ($mapsKey = static::get('google_maps_api_key', env('GOOGLE_MAPS_API_KEY'))) {
+                config(['services.google_maps.key' => $mapsKey]);
+            }
+
+            config([
+                'services.twilio.enabled' => filter_var(static::get('twilio_enabled', env('TWILIO_ENABLED', false)), FILTER_VALIDATE_BOOLEAN),
+                'services.twilio.sid' => static::get('twilio_sid', env('TWILIO_SID')),
+                'services.twilio.token' => static::get('twilio_token', env('TWILIO_TOKEN')),
+                'services.twilio.from' => static::get('twilio_from', env('TWILIO_FROM')),
+            ]);
+        } catch (\Throwable) {
+            // The settings table may not exist during install, migrations, or first deploy.
+        }
+    }
 }
