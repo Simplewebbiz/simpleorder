@@ -3,22 +3,26 @@
 namespace App\Models\Tenant;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class Page extends Model
 {
     protected $fillable = [
+        'name',
         'title',
         'slug',
         'menu_label',
         'summary',
         'content',
         'hero_media_id',
+        'is_active',
         'is_published',
         'sort',
     ];
 
     protected $casts = [
+        'is_active' => 'boolean',
         'is_published' => 'boolean',
     ];
 
@@ -57,8 +61,21 @@ class Page extends Model
         ];
 
         foreach ($defaults as $page) {
-            static::firstOrCreate(['slug' => $page['slug']], $page);
+            static::updateOrCreate(['slug' => $page['slug']], static::withLegacyColumns($page));
         }
+    }
+
+    public static function withLegacyColumns(array $page): array
+    {
+        if (Schema::hasColumn('pages', 'name')) {
+            $page['name'] = $page['title'] ?? $page['name'] ?? $page['slug'];
+        }
+
+        if (Schema::hasColumn('pages', 'is_active')) {
+            $page['is_active'] = $page['is_published'] ?? true;
+        }
+
+        return $page;
     }
 
     public static function uniqueSlug(string $title, ?int $ignoreId = null): string
