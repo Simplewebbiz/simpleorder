@@ -25,6 +25,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .prog-step.active { background: #e85d04; color: #fff; }
 .prog-step.complete { background: #22c55e; color: #fff; }
 .track-btn { display: inline-block; background: #e85d04; color: #ffffff; text-decoration: none; padding: 14px 36px; border-radius: 8px; font-weight: 700; font-size: 15px; }
+.review-box { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 18px 20px; margin: 24px 0; text-align: center; }
+.review-title { color: #9a3412; font-size: 16px; font-weight: 800; margin-bottom: 8px; }
+.review-copy { color: #7c2d12; font-size: 14px; line-height: 1.5; margin-bottom: 14px; }
+.review-btn { display: inline-block; background: #0f766e; color: #ffffff; text-decoration: none; padding: 10px 22px; border-radius: 7px; font-weight: 700; font-size: 14px; }
 .order-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px 20px; margin: 24px 0; text-align: left; font-size: 14px; }
 .order-box .label { color: #9ca3af; font-size: 12px; margin-bottom: 2px; }
 .order-box .value { font-weight: 600; color: #1a1a1a; }
@@ -102,6 +106,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 
         <a href="{{ $trackingUrl }}" class="track-btn">View Live Order Status →</a>
 
+        @if($order->status === 'complete' && !empty($settings['review_request_enabled']) && !empty($settings['review_url']))
+        <div class="review-box">
+            <div class="review-title">Enjoyed your order?</div>
+            <div class="review-copy">{{ $settings['review_request_message'] ?? 'A quick review helps our restaurant grow.' }}</div>
+            <a href="{{ $settings['review_url'] }}" class="review-btn">Leave a Review</a>
+        </div>
+        @endif
         <div class="order-box">
             <div style="display:flex;gap:24px;flex-wrap:wrap;">
                 <div>

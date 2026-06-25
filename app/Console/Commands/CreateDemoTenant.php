@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Plan;
 use App\Models\Tenant;
 use App\Models\Tenant\Category;
+use App\Models\Tenant\Coupon;
 use App\Models\Tenant\Item;
 use App\Models\Tenant\Order;
 use App\Models\Tenant\Page;
@@ -92,6 +93,7 @@ class CreateDemoTenant extends Command
             }
 
             Page::seedDefaults();
+            $this->seedCoupons();
             $this->seedMenu();
             $this->seedSampleOrder($owner);
 
@@ -110,6 +112,19 @@ class CreateDemoTenant extends Command
         return self::SUCCESS;
     }
 
+    private function seedCoupons(): void
+    {
+        Coupon::query()->updateOrCreate(
+            ['code' => 'WELCOME10'],
+            [
+                'name' => 'Welcome Special',
+                'type' => 'percent',
+                'value' => 10,
+                'minimum_subtotal' => 10,
+                'is_active' => true,
+            ]
+        );
+    }
     private function seedMenu(): void
     {
         $category = Category::query()->updateOrCreate(

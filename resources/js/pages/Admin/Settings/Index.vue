@@ -63,6 +63,26 @@
                     </div>
                 </div>
 
+                <!-- Review Requests -->
+                <div class="card">
+                    <div class="card-header">Review Requests</div>
+                    <div class="toggle-row">
+                        <label class="toggle-label">Ask completed customers for a review</label>
+                        <label class="toggle">
+                            <input type="checkbox" v-model="form.review_request_enabled" />
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Google Review Link</label>
+                        <input v-model="form.review_url" type="url" class="field-input" placeholder="https://g.page/r/..." />
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Review Message</label>
+                        <textarea v-model="form.review_request_message" class="field-input" rows="3" maxlength="300"></textarea>
+                    </div>
+                </div>
+
                 <!-- Ordering Options -->
                 <div class="card">
                     <div class="card-header">Ordering Options</div>
@@ -149,6 +169,9 @@ const defaultHours = Object.fromEntries(Object.keys(dayLabels).map(k => [k, { fr
 const form = reactive({
     store_name: props.settings?.store_name || '',
     order_email: props.settings?.order_email || '',
+    review_url: props.settings?.review_url || '',
+    review_request_enabled: props.settings?.review_request_enabled !== false,
+    review_request_message: props.settings?.review_request_message || 'If you enjoyed your order, a quick review helps our restaurant grow.',
     store_phone: props.settings?.store_phone || '',
     store_address: props.settings?.store_address || { address: '', city: '', state: '', zip: '' },
     timezone: props.settings?.timezone || 'America/Chicago',

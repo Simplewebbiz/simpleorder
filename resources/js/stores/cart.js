@@ -7,6 +7,8 @@ export const useCartStore = defineStore('cart', {
         method: null,
         delivery_address: { address: null, city: null, state: null, zip: null },
         tip: null,
+        coupon_code: null,
+        totals: null,
         ui: {
             addressModalOpen: false,
             itemModalOpen: false,
@@ -31,6 +33,8 @@ export const useCartStore = defineStore('cart', {
             this.method = cartData.method
             this.delivery_address = cartData.delivery_address || { address: null, city: null, state: null, zip: null }
             this.tip = cartData.tip
+            this.coupon_code = cartData.coupon_code
+            this.totals = cartData.totals || null
         },
 
         async save(data = {}) {
@@ -38,6 +42,7 @@ export const useCartStore = defineStore('cart', {
                 method: this.method,
                 delivery_address: this.delivery_address,
                 tip: this.tip,
+                coupon_code: this.coupon_code,
                 ...data,
             })
             this.init(response.data)

@@ -63,6 +63,7 @@ Route::middleware([
         // Menu
         Route::resource('categories', Tenant\Admin\CategoryController::class);
         Route::resource('items', Tenant\Admin\ItemController::class);
+        Route::resource('coupons', Tenant\Admin\CouponController::class)->except(['show', 'create', 'edit']);
         Route::resource('pages', Tenant\Admin\PageController::class)->only(['index', 'edit', 'update']);
         Route::post('/items/{item}/options', [Tenant\Admin\ItemController::class, 'saveOptions'])->name('items.options');
 

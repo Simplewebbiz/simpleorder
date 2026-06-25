@@ -12,7 +12,7 @@ class Cart extends Model
     protected $fillable = [
         'user_id', 'session_key', 'method',
         'delivery_address', 'delivery_city', 'delivery_state', 'delivery_zip',
-        'tip', 'stripe_intent',
+        'tip', 'coupon_code', 'stripe_intent',
     ];
 
     protected $casts = ['tip' => 'decimal:2'];

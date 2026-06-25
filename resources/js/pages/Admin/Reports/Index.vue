@@ -1,5 +1,5 @@
 <template>
-    <AdminLayout title="Reports">
+    <AdminLayout page-title="Reports">
         <div class="reports-page">
             <!-- Date filter -->
             <div class="filter-bar">
@@ -23,6 +23,7 @@
                 <SummaryCard label="Avg Order" :value="'$' + fmt(summary.avg_order)" icon="trending-up" />
                 <SummaryCard label="Tax Collected" :value="'$' + fmt(summary.total_tax)" icon="percent" />
                 <SummaryCard label="Tips" :value="'$' + fmt(summary.total_tips)" icon="heart" />
+                <SummaryCard label="Discounts" :value="'$' + fmt(summary.total_discount)" icon="percent" />
                 <SummaryCard label="Delivery Fees" :value="'$' + fmt(summary.total_delivery)" icon="truck" />
             </div>
 

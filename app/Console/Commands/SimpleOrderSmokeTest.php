@@ -121,6 +121,7 @@ class SimpleOrderSmokeTest extends Command
             'tenant.admin.orders.index',
             'tenant.admin.categories.index',
             'tenant.admin.items.index',
+            'tenant.admin.coupons.index',
             'tenant.admin.pages.index',
             'tenant.admin.media.index',
             'tenant.admin.users.index',
@@ -154,6 +155,7 @@ class SimpleOrderSmokeTest extends Command
             'resources/js/pages/Admin/Orders/Index.vue',
             'resources/js/pages/Admin/Categories/Index.vue',
             'resources/js/pages/Admin/Items/Index.vue',
+            'resources/js/pages/Admin/Coupons/Index.vue',
             'resources/js/pages/Admin/Pages/Index.vue',
             'resources/js/pages/Admin/Media/Index.vue',
             'resources/js/pages/Admin/Users/Index.vue',
@@ -199,6 +201,7 @@ class SimpleOrderSmokeTest extends Command
                 'cart_items',
                 'orders',
                 'order_items',
+                'coupons',
                 'settings',
                 'geocodes',
                 'pages',
@@ -234,6 +237,10 @@ class SimpleOrderSmokeTest extends Command
 
             if (Schema::hasTable('orders')) {
                 $this->passIf(DB::table('orders')->whereNull('deleted_at')->count() > 0, "Tenant {$tenant->id} has at least one order", 'Place or seed a test order to verify the order queue and reports.');
+            }
+
+            if (Schema::hasTable('coupons')) {
+                $this->passIf(DB::table('coupons')->whereNull('deleted_at')->count() > 0, "Tenant {$tenant->id} has at least one coupon", 'Create a promo code for testing coupons.');
             }
         } catch (Throwable $exception) {
             $this->failCheck("Tenant database check failed: {$exception->getMessage()}");

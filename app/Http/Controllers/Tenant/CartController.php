@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
-use App\Models\Tenant\{Cart, CartItem, CartItemOption, Order, OrderItem, OrderItemOption, OrderItemOptionValue, Setting};
+use App\Models\Tenant\{Cart, Coupon, Setting};
 use App\Services\CartService;
 use App\Services\GeocodingService;
 use App\Services\OrderService;
@@ -30,6 +30,7 @@ class CartController extends Controller
             'delivery_state'   => $request->delivery_address['state'] ?? null,
             'delivery_zip'     => $request->delivery_address['zip'] ?? null,
             'tip'              => $request->tip ?? null,
+            'coupon_code'      => Coupon::normalizeCode($request->coupon_code),
         ]);
 
         return response()->json($this->cartService->format($cart));

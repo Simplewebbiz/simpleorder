@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Tenant\{Cart, Order, OrderItem, OrderItemOption, OrderItemOptionValue, Setting};
+use App\Models\Tenant\{Cart, Coupon, Order, OrderItem, OrderItemOption, OrderItemOptionValue, Setting};
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Stripe\StripeClient;
@@ -107,9 +107,15 @@ class OrderService
                 'tax' => $totals['tax'],
                 'delivery' => $totals['delivery'],
                 'tip' => $totals['tip'],
+                'coupon_code' => $totals['coupon_code'],
+                'discount' => $totals['discount'],
                 'total' => $totals['total'],
                 'comments' => $data['notes'] ?? null,
             ]);
+
+            if (! empty($totals['coupon_code'])) {
+                Coupon::where('code', $totals['coupon_code'])->increment('used_count');
+            }
 
             foreach ($cart->items as $cartItem) {
                 $item = $cartItem->item;
@@ -175,6 +181,8 @@ class OrderService
             'tax' => (float) $order->tax,
             'delivery' => (float) $order->delivery,
             'tip' => (float) $order->tip,
+            'coupon_code' => $order->coupon_code,
+            'discount' => (float) $order->discount,
             'total' => (float) $order->total,
             'comments' => $order->comments,
             'created_at' => $order->created_at->toISOString(),

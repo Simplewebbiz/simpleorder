@@ -93,6 +93,7 @@
                             <div class="total-row"><span>Tax</span><span>${{ fmt(order.tax) }}</span></div>
                             <div class="total-row" v-if="order.delivery > 0"><span>Delivery</span><span>${{ fmt(order.delivery) }}</span></div>
                             <div class="total-row" v-if="order.tip > 0"><span>Tip</span><span>${{ fmt(order.tip) }}</span></div>
+                            <div class="total-row discount" v-if="order.discount > 0"><span>Discount <template v-if="order.coupon_code">({{ order.coupon_code }})</template></span><span>- ${{ fmt(order.discount) }}</span></div>
                             <div class="total-row grand"><span>Grand Total</span><span>${{ fmt(order.total) }}</span></div>
                         </div>
                     </div>
@@ -195,6 +196,7 @@ const formatDate = (d) => d ? new Date(d).toLocaleString('en-US', { dateStyle: '
 .oi-note { font-size: 12px; color: #9ca3af; font-style: italic; margin-top: 3px; }
 .totals { margin-top: 12px; border-top: 2px solid #f3f4f6; }
 .total-row { display: flex; justify-content: space-between; font-size: 14px; padding: 7px 0; }
+.total-row.discount { color: #15803d; font-weight: 700; }
 .total-row.grand { font-size: 16px; font-weight: 800; border-top: 2px solid #1a1a1a; margin-top: 6px; padding-top: 10px; }
 .order-notes { font-size: 14px; color: #374151; line-height: 1.5; }
 </style>

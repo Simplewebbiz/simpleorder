@@ -14,6 +14,7 @@
                 <Link :href="route('tenant.admin.orders.index')" class="nav-item" :class="{ active: isActive('orders') }"><span class="nav-icon">Or</span> Orders <span class="badge" v-if="pendingCount > 0">{{ pendingCount }}</span></Link>
                 <Link :href="route('tenant.admin.categories.index')" class="nav-item" :class="{ active: isActive('categories') }"><span class="nav-icon">Ct</span> Categories</Link>
                 <Link :href="route('tenant.admin.items.index')" class="nav-item" :class="{ active: isActive('items') }"><span class="nav-icon">Mn</span> Menu Items</Link>
+                <Link :href="route('tenant.admin.coupons.index')" class="nav-item" :class="{ active: isActive('coupons') }"><span class="nav-icon">%</span> Coupons</Link>
                 <Link :href="route('tenant.admin.pages.index')" class="nav-item" :class="{ active: isActive('pages') }"><span class="nav-icon">Pg</span> Pages</Link>
                 <Link :href="route('tenant.admin.media.index')" class="nav-item" :class="{ active: isActive('media') }"><span class="nav-icon">Img</span> Media</Link>
                 <Link :href="route('tenant.admin.users.index')" class="nav-item" :class="{ active: isActive('users') }"><span class="nav-icon">Sf</span> Staff</Link>

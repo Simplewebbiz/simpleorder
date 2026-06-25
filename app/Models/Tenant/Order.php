@@ -16,7 +16,7 @@ class Order extends Model
         'billing_firstname', 'billing_lastname', 'billing_address',
         'billing_city', 'billing_state', 'billing_zip',
         'stripe_payment_intent', 'stripe_charge_id', 'card_brand', 'card_last4',
-        'subtotal', 'tax', 'delivery', 'tip', 'total', 'comments',
+        'subtotal', 'tax', 'delivery', 'tip', 'coupon_code', 'discount', 'total', 'comments',
     ];
 
     protected $casts = [
@@ -24,6 +24,7 @@ class Order extends Model
         'tax' => 'decimal:2',
         'delivery' => 'decimal:2',
         'tip' => 'decimal:2',
+        'discount' => 'decimal:2',
         'total' => 'decimal:2',
     ];
 

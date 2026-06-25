@@ -3,9 +3,9 @@
 namespace App\Jobs;
 
 use App\Mail\OrderStatusUpdateMail;
+use App\Models\Tenant;
 use App\Models\Tenant\Order;
 use App\Models\Tenant\Setting;
-use App\Models\Tenant;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -26,12 +26,16 @@ class SendOrderStatusUpdate implements ShouldQueue
     {
         tenancy()->initialize($this->tenant);
 
-        $settings = [
-            'store_name' => Setting::get('store_name', 'SimpleOrder'),
-            'order_email' => Setting::get('order_email'),
-        ];
+        try {
+            $settings = [];
+            foreach (Setting::defaults() as $key => $value) {
+                $settings[$key] = Setting::get($key, $value);
+            }
 
-        Mail::to($this->order->contact_email, $this->order->contactName())
-            ->send(new OrderStatusUpdateMail($this->order, $this->tenant, $settings));
+            Mail::to($this->order->contact_email, $this->order->contactName())
+                ->send(new OrderStatusUpdateMail($this->order, $this->tenant, $settings));
+        } finally {
+            tenancy()->end();
+        }
     }
 }

@@ -27,6 +27,7 @@ class ReportController extends Controller
             'total_tax'      => $orders->sum('tax'),
             'total_delivery' => $orders->sum('delivery'),
             'total_tips'     => $orders->sum('tip'),
+            'total_discount' => $orders->sum('discount'),
             'avg_order'      => $orders->count() ? round($orders->sum('total') / $orders->count(), 2) : 0,
             'pickup_count'   => $orders->where('method', 'pickup')->count(),
             'delivery_count' => $orders->where('method', 'delivery')->count(),
@@ -82,7 +83,7 @@ class ReportController extends Controller
             fputcsv($handle, [
                 'Order #', 'Date', 'Status', 'Method',
                 'Customer Name', 'Email', 'Phone',
-                'Items', 'Subtotal', 'Tax', 'Delivery', 'Tip', 'Total',
+                'Items', 'Subtotal', 'Tax', 'Delivery', 'Tip', 'Discount', 'Coupon', 'Total',
                 'Card', 'Notes',
             ]);
 
@@ -101,6 +102,8 @@ class ReportController extends Controller
                     number_format($order->tax, 2),
                     number_format($order->delivery, 2),
                     number_format($order->tip, 2),
+                    number_format($order->discount, 2),
+                    $order->coupon_code,
                     number_format($order->total, 2),
                     strtoupper($order->card_brand ?? '') . ' ****' . $order->card_last4,
                     $order->comments,
