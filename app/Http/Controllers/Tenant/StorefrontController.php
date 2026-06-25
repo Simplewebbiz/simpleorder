@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Tenant;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\{Category, Cart, Page, Setting};
 use App\Services\CartService;
+use App\Services\StoreAvailabilityService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class StorefrontController extends Controller
 {
-    public function index(Request $request, CartService $cartService)
+    public function index(Request $request, CartService $cartService, StoreAvailabilityService $availability)
     {
         Page::seedDefaults();
 
@@ -39,6 +40,7 @@ class StorefrontController extends Controller
             'allow_pickup'   => Setting::get('allow_pickup', true),
             'allow_delivery' => Setting::get('allow_delivery', true),
             'stripe_key'     => Setting::get('stripe_publishable_key') ?: config('stripe.key'),
+            'ordering_status' => $availability->status(),
         ];
 
         $tenant = tenant();

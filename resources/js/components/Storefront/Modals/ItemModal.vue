@@ -183,17 +183,18 @@ async function addToCart() {
     addError.value = ''
     try {
         const payload = {
-            item_id: props.item.id,
+            id: props.item.id,
             qty: qty.value,
             comments: comments.value,
+            method: cart.method,
             selections: Object.entries(selections.value).map(([optId, vals]) => ({
-                option_id: optId,
-                values: vals.map(v => v.id),
+                id: Number(optId),
+                selections: vals.map(v => ({ id: v.id })),
             })),
         }
-        if (props.editCartItemId) payload.cart_item_id = props.editCartItemId
+        if (props.editCartItemId) payload.cart_id = props.editCartItemId
         const { data } = await axios.post('/ordering/cart/item', payload)
-        cart.init(data.cart)
+        cart.init(data)
         close()
     } catch (e) {
         addError.value = e.response?.data?.message || 'Could not add item. Please try again.'

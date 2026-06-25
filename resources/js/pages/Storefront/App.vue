@@ -47,9 +47,25 @@
             @navigate="navigateTo"
         />
 
-        <AddressModal v-if="cart.ui.addressModalOpen" :settings="settings" @done="cart.ui.itemModalOpen = true" />
-        <ItemModal v-if="cart.ui.itemModalOpen" :settings="settings" />
-        <ClosedModal v-if="cart.ui.closedModalOpen" :settings="settings" />
+        <AddressModal
+            v-if="cart.ui.addressModalOpen"
+            :open="true"
+            :settings="settings"
+            @confirm="handleOrderMethod"
+            @close="cart.ui.addressModalOpen = false"
+        />
+        <ItemModal
+            v-if="cart.ui.itemModalOpen"
+            :open="true"
+            :item="cart.ui.pendingItem"
+            @close="closeItemModal"
+        />
+        <ClosedModal
+            v-if="cart.ui.closedModalOpen"
+            :open="true"
+            :settings="settings"
+            @close="cart.ui.closedModalOpen = false"
+        />
     </div>
 </template>
 
@@ -88,6 +104,30 @@ const storeOpen = ref(true)
 
 const publishedPages = computed(() => props.pages || [])
 const homePage = computed(() => publishedPages.value.find(page => page.slug === 'home') || null)
+
+async function handleOrderMethod(selection) {
+    const deliveryAddress = selection.method === 'delivery'
+        ? {
+            address: selection.delivery_address,
+            city: selection.delivery_city,
+            state: selection.delivery_state,
+            zip: selection.delivery_zip,
+        }
+        : { address: null, city: null, state: null, zip: null }
+
+    await cart.save({
+        method: selection.method,
+        delivery_address: deliveryAddress,
+    })
+
+    cart.ui.addressModalOpen = false
+    if (cart.ui.pendingItem) cart.ui.itemModalOpen = true
+}
+
+function closeItemModal() {
+    cart.ui.itemModalOpen = false
+    cart.ui.pendingItem = null
+}
 
 function navigateTo(view, payload = null, replace = false) {
     const setUrl = (url) => replace ? history.replaceState({}, '', url) : history.pushState({}, '', url)

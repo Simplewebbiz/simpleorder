@@ -90,6 +90,10 @@ function calcItemPrice(item) {
 }
 
 export function isStoreOpen(settings) {
+    if (typeof settings?.ordering_status?.open === 'boolean') {
+        return settings.ordering_status.open
+    }
+
     if (!settings?.store_hours) return true
     const tz = settings.timezone || 'America/Chicago'
     const now = new Date(new Date().toLocaleString('en-US', { timeZone: tz }))
@@ -98,20 +102,26 @@ export function isStoreOpen(settings) {
     const hours = settings.store_hours[dayKey]
     if (!hours || hours.closed) return false
     if (!hours.from || !hours.to) return false
-    const [fromH, fromM] = parseTime(hours.from)
-    const [toH, toM] = parseTime(hours.to)
+    const from = parseTime(hours.from)
+    const to = parseTime(hours.to)
+    if (!from || !to) return false
+
     const nowMins = now.getHours() * 60 + now.getMinutes()
-    const fromMins = fromH * 60 + fromM
-    const toMins = toH * 60 + toM
+    const fromMins = from[0] * 60 + from[1]
+    const toMins = to[0] * 60 + to[1]
+
+    if (toMins < fromMins) return nowMins >= fromMins || nowMins <= toMins
     return nowMins >= fromMins && nowMins <= toMins
 }
 
 function parseTime(str) {
-    const match = str.match(/(\d+):(\d+)(AM|PM)/)
-    if (!match) return [0, 0]
+    const match = String(str || '').trim().toUpperCase().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/)
+    if (!match) return null
+
     let h = parseInt(match[1])
     const m = parseInt(match[2])
     const ampm = match[3]
+    if (h > 23 || m > 59) return null
     if (ampm === 'PM' && h !== 12) h += 12
     if (ampm === 'AM' && h === 12) h = 0
     return [h, m]

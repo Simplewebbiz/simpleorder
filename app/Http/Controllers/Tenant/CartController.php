@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
-use App\Models\Tenant\{Cart, Coupon, Setting};
+use App\Models\Tenant\{Coupon, Setting};
 use App\Services\CartService;
 use App\Services\GeocodingService;
 use App\Services\OrderService;
+use App\Services\StoreAvailabilityService;
 use App\Jobs\SendOrderConfirmation;
 use App\Events\OrderPlaced;
 use Illuminate\Http\Request;
@@ -18,10 +19,13 @@ class CartController extends Controller
         private CartService $cartService,
         private GeocodingService $geocodingService,
         private OrderService $orderService,
+        private StoreAvailabilityService $availability,
     ) {}
 
     public function save(Request $request)
     {
+        $this->availability->ensureMethodIsAvailable($request->method);
+
         $cart = $this->cartService->getOrCreate($request);
         $cart->update([
             'method'           => $request->method,
@@ -42,6 +46,8 @@ class CartController extends Controller
             'id'  => 'required|exists:items,id',
             'qty' => 'required|integer|min:1|max:99',
         ]);
+
+        $this->availability->ensureOnlineOrderingIsAvailable($request->method);
 
         $cart = $this->cartService->getOrCreate($request);
         $cartItem = $this->cartService->addOrUpdateItem($cart, $request->all());
@@ -65,6 +71,8 @@ class CartController extends Controller
             'state'   => 'required|string|size:2',
             'zip'     => 'required|string|size:5',
         ]);
+
+        $this->availability->ensureMethodIsAvailable('delivery');
 
         $fullAddress = $request->address . ' ' . $request->city . ', ' . $request->state . ' ' . $request->zip;
         $storeAddress = Setting::get('store_address');
@@ -97,6 +105,7 @@ class CartController extends Controller
         ]);
 
         $cart = $this->cartService->getOrCreate($request);
+        $this->availability->ensureOnlineOrderingIsAvailable($cart->method);
 
         if ($cart->items->isEmpty()) {
             abort(422, 'Your cart is empty.');
@@ -127,6 +136,8 @@ class CartController extends Controller
         ]);
 
         $cart = $this->cartService->getOrCreate($request);
+        $this->availability->ensureOnlineOrderingIsAvailable($cart->method);
+
         $order = $this->orderService->createFromCart($cart, $request->all());
 
         // Notify customer + store

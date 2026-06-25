@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tenant\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class SettingsController extends Controller
@@ -16,6 +17,8 @@ class SettingsController extends Controller
         foreach ($keys as $key) {
             $settings[$key] = Setting::get($key, Setting::defaults()[$key]);
         }
+
+        $settings['store_hours'] = $this->normalizeStoreHours($settings['store_hours'] ?? Setting::defaults()['store_hours']);
 
         return Inertia::render('Admin/Settings/Index', [
             'settings'    => $settings,
@@ -48,11 +51,53 @@ class SettingsController extends Controller
             'allow_delivery'   => 'boolean',
         ]);
 
+        if (! ($data['allow_pickup'] ?? false) && ! ($data['allow_delivery'] ?? false)) {
+            throw ValidationException::withMessages([
+                'ordering' => ['Turn on pickup or delivery before saving settings.'],
+            ]);
+        }
+
         foreach ($data as $key => $value) {
             Setting::set($key, $value);
         }
 
         return back()->with('success', 'Settings saved.');
+    }
+
+    private function normalizeStoreHours(array $hours): array
+    {
+        foreach ($hours as $day => $range) {
+            $hours[$day]['from'] = $this->normalizeTime($range['from'] ?? null) ?? '10:00';
+            $hours[$day]['to'] = $this->normalizeTime($range['to'] ?? null) ?? '22:00';
+            $hours[$day]['closed'] = (bool) ($range['closed'] ?? false);
+        }
+
+        return $hours;
+    }
+
+    private function normalizeTime(?string $time): ?string
+    {
+        if (! $time || ! preg_match('/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i', trim($time), $matches)) {
+            return null;
+        }
+
+        $hour = (int) $matches[1];
+        $minute = (int) $matches[2];
+        $period = strtoupper($matches[3] ?? '');
+
+        if ($hour > 23 || $minute > 59) {
+            return null;
+        }
+
+        if ($period === 'PM' && $hour !== 12) {
+            $hour += 12;
+        }
+
+        if ($period === 'AM' && $hour === 12) {
+            $hour = 0;
+        }
+
+        return sprintf('%02d:%02d', $hour, $minute);
     }
 
     public function stripe()
