@@ -100,11 +100,22 @@ class CreateDemoTenant extends Command
             if (Schema::hasTable('order_sequences') && DB::table('order_sequences')->count() === 0) {
                 DB::table('order_sequences')->insert(['next_id' => 2]);
             }
+
+            $counts = [
+                'pages' => Schema::hasTable('pages') ? DB::table('pages')->count() : 0,
+                'categories' => Schema::hasTable('categories') ? DB::table('categories')->whereNull('deleted_at')->count() : 0,
+                'items' => Schema::hasTable('items') ? DB::table('items')->whereNull('deleted_at')->count() : 0,
+                'orders' => Schema::hasTable('orders') ? DB::table('orders')->whereNull('deleted_at')->count() : 0,
+                'coupons' => Schema::hasTable('coupons') ? DB::table('coupons')->whereNull('deleted_at')->count() : 0,
+            ];
         } finally {
             tenancy()->end();
         }
 
         $this->info('Demo tenant is ready.');
+        foreach ($counts ?? [] as $label => $count) {
+            $this->line(ucfirst($label) . ': ' . $count);
+        }
         $this->line('Restaurant site: https://' . $domain);
         $this->line('Restaurant admin: https://' . $domain . '/admin');
         $this->line('Owner login: ' . $email);
