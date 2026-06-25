@@ -124,8 +124,14 @@
             </div>
 
             <div class="loading-card" v-else>
-                <div class="spinner"></div>
-                <p>Loading your order...</p>
+                <template v-if="loadError">
+                    <p class="load-error">{{ loadError }}</p>
+                    <a href="/" class="home-link">Back to menu</a>
+                </template>
+                <template v-else>
+                    <div class="spinner"></div>
+                    <p>Loading your order...</p>
+                </template>
             </div>
         </div>
     </div>
@@ -145,13 +151,14 @@ const props = defineProps({
 const page = usePage()
 const brand = page.props.tenant_brand || {}
 const order = ref(props.order || null)
+const loadError = ref('')
 
-const progressSteps = [
+const progressSteps = computed(() => [
     { key: 'placed', label: 'Placed' },
     { key: 'received', label: 'Received' },
     { key: 'ready', label: order.value?.method === 'delivery' ? 'On the Way' : 'Ready' },
     { key: 'complete', label: 'Complete' },
-]
+])
 
 const statusOrder = ['placed', 'received', 'ready', 'complete']
 const stepIndex = (key) => statusOrder.indexOf(key)
@@ -181,11 +188,17 @@ function lineTotal(item) {
 // Real-time updates via Echo
 let channel = null
 onMounted(async () => {
-    if (!order.value && props.orderKey) {
-        const { data } = await axios.post('/ordering/order/' + props.orderKey, {})
-        order.value = data
+    try {
+        if (!order.value && props.orderKey) {
+            const { data } = await axios.post('/ordering/order/' + props.orderKey, {})
+            order.value = data
+        }
+    } catch (error) {
+        loadError.value = 'We could not find that order. Please contact the restaurant if you need help.'
+        return
     }
-    if (order.value?.key) {
+
+    if (order.value?.key && window.Echo) {
         channel = window.Echo.channel('order.' + order.value.key)
             .listen('.order-updated', async () => {
                 const { data } = await axios.post('/ordering/order/' + order.value.key, {})
@@ -195,7 +208,7 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
-    if (channel) window.Echo.leaveChannel('order.' + order.value?.key)
+    if (channel && window.Echo) window.Echo.leaveChannel('order.' + order.value?.key)
 })
 </script>
 
@@ -255,6 +268,8 @@ onUnmounted(() => {
 .rc-title { font-size: 13px; color: #6b7280; font-weight: 600; }
 .rc-item { font-size: 14px; color: #e85d04; text-decoration: none; font-weight: 600; }
 .loading-card { text-align: center; padding: 80px 20px; background: #fff; border-radius: 16px; }
+.load-error { max-width: 420px; margin: 0 auto 18px; color: #7f1d1d; font-weight: 700; line-height: 1.5; }
+.home-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 20px; border-radius: 999px; background: #e85d04; color: #fff; font-weight: 800; text-decoration: none; }
 .spinner { width: 40px; height: 40px; border: 3px solid #e5e7eb; border-top-color: #e85d04; border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 16px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>

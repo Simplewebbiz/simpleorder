@@ -30,13 +30,14 @@
             <StorefrontCheckout
                 v-else-if="currentView === 'checkout'"
                 :settings="settings"
-                @placed="(order) => { currentView = 'order-placed'; placedOrder = order }"
+                @placed="handleOrderPlaced"
                 @back="navigateTo('home')"
             />
             <StorefrontOrderPlaced
                 v-else-if="currentView === 'order-placed'"
                 :order="placedOrder"
                 :settings="settings"
+                :order-key="orderKey"
             />
         </main>
 
@@ -100,6 +101,7 @@ const currentView = ref('home')
 const activeCategory = ref(null)
 const activePage = ref(null)
 const placedOrder = ref(null)
+const orderKey = ref(null)
 const storeOpen = ref(true)
 
 const publishedPages = computed(() => props.pages || [])
@@ -135,6 +137,8 @@ function navigateTo(view, payload = null, replace = false) {
         currentView.value = 'home'
         activeCategory.value = null
         activePage.value = null
+        placedOrder.value = null
+        orderKey.value = null
         setUrl(view === 'menu' ? '/menu' : '/')
         return
     }
@@ -143,6 +147,8 @@ function navigateTo(view, payload = null, replace = false) {
         currentView.value = 'category'
         activeCategory.value = payload
         activePage.value = null
+        placedOrder.value = null
+        orderKey.value = null
         setUrl('/' + payload.slug)
         return
     }
@@ -151,13 +157,27 @@ function navigateTo(view, payload = null, replace = false) {
         currentView.value = 'page'
         activePage.value = payload
         activeCategory.value = null
+        placedOrder.value = null
+        orderKey.value = null
         setUrl('/' + payload.slug)
         return
     }
 
     if (view === 'checkout') {
         currentView.value = 'checkout'
+        placedOrder.value = null
+        orderKey.value = null
         setUrl('/checkout')
+    }
+}
+
+function handleOrderPlaced(order) {
+    placedOrder.value = order
+    orderKey.value = order?.key || null
+    currentView.value = 'order-placed'
+
+    if (order?.key) {
+        history.pushState({}, '', '/thank-you/' + order.key)
     }
 }
 
@@ -168,6 +188,8 @@ function routeFromPath() {
     if (path === 'menu') return navigateTo('menu', null, true)
     if (path === 'checkout') return navigateTo('checkout', null, true)
     if (path.startsWith('thank-you/')) {
+        placedOrder.value = null
+        orderKey.value = path.replace('thank-you/', '')
         currentView.value = 'order-placed'
         return
     }

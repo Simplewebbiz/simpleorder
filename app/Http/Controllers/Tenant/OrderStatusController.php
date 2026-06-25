@@ -4,18 +4,17 @@ namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Order;
+use App\Services\OrderService;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 
 class OrderStatusController extends Controller
 {
-    public function show(Request $request, string $key)
+    public function show(Request $request, string $key, OrderService $orders)
     {
-        $order = Order::where('tracking_key', $key)->firstOrFail();
+        $order = Order::with('items.options.values')
+            ->where('key', $key)
+            ->firstOrFail();
 
-        return response()->json([
-            'order' => $order,
-            'status' => $order->status,
-        ]);
+        return response()->json($orders->formatForResponse($order));
     }
 }

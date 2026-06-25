@@ -117,6 +117,7 @@ class SimpleOrderSmokeTest extends Command
             'platform.superadmin.plans.index',
             'platform.superadmin.marketing-pages.index',
             'platform.superadmin.settings',
+            'tenant.ordering.order.show',
             'tenant.admin.dashboard',
             'tenant.admin.orders.index',
             'tenant.admin.categories.index',
