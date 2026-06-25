@@ -14,7 +14,8 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Order::with(['items'])
+        $query = Order::query()
+            ->withCount('items')
             ->orderByDesc('created_at');
 
         if ($request->status) {
@@ -25,7 +26,8 @@ class OrderController extends Controller
             $query->where(function ($q) use ($request) {
                 $q->where('increment_id', $request->search)
                   ->orWhere('contact_email', 'like', '%' . $request->search . '%')
-                  ->orWhere('contact_lastname', 'like', '%' . $request->search . '%');
+                  ->orWhere('contact_lastname', 'like', '%' . $request->search . '%')
+                  ->orWhere('contact_phone', 'like', '%' . $request->search . '%');
             });
         }
 
@@ -37,11 +39,37 @@ class OrderController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
-        $orders = $query->paginate(25)->withQueryString();
+        $orders = $query->paginate(25)->withQueryString()->through(fn (Order $order) => [
+            'id' => $order->id,
+            'increment_id' => $order->increment_id,
+            'contact_firstname' => $order->contact_firstname,
+            'contact_lastname' => $order->contact_lastname,
+            'contact_email' => $order->contact_email,
+            'contact_phone' => $order->contact_phone,
+            'method' => $order->method,
+            'status' => $order->status,
+            'items_count' => $order->items_count,
+            'total' => $order->total,
+            'created_at' => $order->created_at,
+            'next_status' => $this->nextStatus($order->status),
+        ]);
+
+        $statusCounts = Order::query()
+            ->selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
 
         return Inertia::render('Admin/Orders/Index', [
             'orders'  => $orders,
             'filters' => $request->only(['status', 'search', 'date_from', 'date_to']),
+            'statusCounts' => [
+                'placed' => (int) ($statusCounts['placed'] ?? 0),
+                'received' => (int) ($statusCounts['received'] ?? 0),
+                'ready' => (int) ($statusCounts['ready'] ?? 0),
+                'complete' => (int) ($statusCounts['complete'] ?? 0),
+                'cancelled' => (int) ($statusCounts['cancelled'] ?? 0),
+            ],
+            'pendingCount' => (int) (($statusCounts['placed'] ?? 0) + ($statusCounts['received'] ?? 0) + ($statusCounts['ready'] ?? 0)),
         ]);
     }
 
@@ -72,5 +100,15 @@ class OrderController extends Controller
         }
 
         return back()->with('success', 'Order status updated.');
+    }
+
+    private function nextStatus(string $status): ?string
+    {
+        return match ($status) {
+            'placed' => 'received',
+            'received' => 'ready',
+            'ready' => 'complete',
+            default => null,
+        };
     }
 }
