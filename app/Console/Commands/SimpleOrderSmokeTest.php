@@ -203,7 +203,7 @@ class SimpleOrderSmokeTest extends Command
                 'order_items',
                 'coupons',
                 'settings',
-                'geocodes',
+                'address_geocodes',
                 'pages',
             ];
 
