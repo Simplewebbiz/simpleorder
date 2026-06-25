@@ -24,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'tenant.admin'         => \App\Http\Middleware\RequireTenantAdmin::class,
+            'tenant.manager'       => \App\Http\Middleware\RequireTenantManager::class,
             'tenant.active'        => \App\Http\Middleware\RequireActiveTenant::class,
             'tenant.subscription'  => \App\Http\Middleware\TenantSubscriptionActive::class,
             'super.admin'          => \App\Http\Middleware\RequireSuperAdmin::class,

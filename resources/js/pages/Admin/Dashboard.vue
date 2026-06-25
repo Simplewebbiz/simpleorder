@@ -1,6 +1,6 @@
 <template>
     <AdminLayout page-title="Dashboard" :pending-count="pendingOrders.length">
-        <div class="dashboard-grid">
+        <div class="dashboard-grid" v-if="canManage">
             <section class="setup-panel">
                 <div class="setup-copy">
                     <p class="eyebrow">Setup Progress</p>
@@ -105,6 +105,7 @@ const props = defineProps({
 })
 
 const page = usePage()
+const canManage = ['owner', 'manager'].includes(page.props.auth?.tenant_user?.role)
 const newOrderAlert = ref(null)
 let channel = null
 

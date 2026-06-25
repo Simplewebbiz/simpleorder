@@ -12,20 +12,20 @@
             <nav class="sidebar-nav">
                 <Link :href="route('tenant.admin.dashboard')" class="nav-item" :class="{ active: isActive('dashboard') }"><span class="nav-icon">Db</span> Dashboard</Link>
                 <Link :href="route('tenant.admin.orders.index')" class="nav-item" :class="{ active: isActive('orders') }"><span class="nav-icon">Or</span> Orders <span class="badge" v-if="pendingCount > 0">{{ pendingCount }}</span></Link>
-                <Link :href="route('tenant.admin.categories.index')" class="nav-item" :class="{ active: isActive('categories') }"><span class="nav-icon">Ct</span> Categories</Link>
-                <Link :href="route('tenant.admin.items.index')" class="nav-item" :class="{ active: isActive('items') }"><span class="nav-icon">Mn</span> Menu Items</Link>
-                <Link :href="route('tenant.admin.coupons.index')" class="nav-item" :class="{ active: isActive('coupons') }"><span class="nav-icon">%</span> Coupons</Link>
-                <Link :href="route('tenant.admin.pages.index')" class="nav-item" :class="{ active: isActive('pages') }"><span class="nav-icon">Pg</span> Pages</Link>
-                <Link :href="route('tenant.admin.media.index')" class="nav-item" :class="{ active: isActive('media') }"><span class="nav-icon">Img</span> Media</Link>
-                <Link :href="route('tenant.admin.users.index')" class="nav-item" :class="{ active: isActive('users') }"><span class="nav-icon">Sf</span> Staff</Link>
-                <Link :href="route('tenant.admin.reports.index')" class="nav-item" :class="{ active: isActive('reports') }"><span class="nav-icon">Rp</span> Reports</Link>
-                <Link :href="route('tenant.admin.settings.index')" class="nav-item" :class="{ active: isActive('settings') }"><span class="nav-icon">St</span> Settings</Link>
-                <Link :href="route('tenant.admin.settings.stripe')" class="nav-item" :class="{ active: isActive('stripe') }"><span class="nav-icon">Pay</span> Stripe Connect</Link>
+                <Link v-if="canManage" :href="route('tenant.admin.categories.index')" class="nav-item" :class="{ active: isActive('categories') }"><span class="nav-icon">Ct</span> Categories</Link>
+                <Link v-if="canManage" :href="route('tenant.admin.items.index')" class="nav-item" :class="{ active: isActive('items') }"><span class="nav-icon">Mn</span> Menu Items</Link>
+                <Link v-if="canManage" :href="route('tenant.admin.coupons.index')" class="nav-item" :class="{ active: isActive('coupons') }"><span class="nav-icon">%</span> Coupons</Link>
+                <Link v-if="canManage" :href="route('tenant.admin.pages.index')" class="nav-item" :class="{ active: isActive('pages') }"><span class="nav-icon">Pg</span> Pages</Link>
+                <Link v-if="canManage" :href="route('tenant.admin.media.index')" class="nav-item" :class="{ active: isActive('media') }"><span class="nav-icon">Img</span> Media</Link>
+                <Link v-if="canManage" :href="route('tenant.admin.users.index')" class="nav-item" :class="{ active: isActive('users') }"><span class="nav-icon">Sf</span> Staff</Link>
+                <Link v-if="canManage" :href="route('tenant.admin.reports.index')" class="nav-item" :class="{ active: isActive('reports') }"><span class="nav-icon">Rp</span> Reports</Link>
+                <Link v-if="canManage" :href="route('tenant.admin.settings.index')" class="nav-item" :class="{ active: isActive('settings') }"><span class="nav-icon">St</span> Settings</Link>
+                <Link v-if="canManage" :href="route('tenant.admin.settings.stripe')" class="nav-item" :class="{ active: isActive('stripe') }"><span class="nav-icon">Pay</span> Stripe Connect</Link>
             </nav>
 
             <div class="sidebar-footer">
                 <Link :href="route('tenant.storefront')" class="footer-link" target="_blank">View Store</Link>
-                <a :href="route('platform.billing.index')" class="footer-link">Subscription</a>
+                <a v-if="canManage" :href="route('platform.billing.index')" class="footer-link">Subscription</a>
                 <form @submit.prevent="logout"><button type="submit" class="logout-btn">Sign Out</button></form>
             </div>
         </aside>
@@ -61,6 +61,7 @@ const props = defineProps({
 const page = usePage()
 const brand = page.props.tenant_brand || {}
 const user = page.props.auth?.tenant_user
+const canManage = ['owner', 'manager'].includes(user?.role)
 const flash = page.props.flash || {}
 const sidebarOpen = ref(false)
 

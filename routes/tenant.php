@@ -46,41 +46,42 @@ Route::middleware([
 
         Route::get('/', [Tenant\Admin\DashboardController::class, 'index'])->name('dashboard');
 
-        // Orders
+        // Orders are available to owners, managers, and fulfillment staff.
         Route::prefix('orders')->name('orders.')->group(function () {
             Route::get('/', [Tenant\Admin\OrderController::class, 'index'])->name('index');
-            Route::get('/reports/export', [Tenant\Admin\ReportController::class, 'export'])->name('reports.export');
             Route::get('/{order}', [Tenant\Admin\OrderController::class, 'show'])->name('show');
             Route::patch('/{order}/status', [Tenant\Admin\OrderController::class, 'updateStatus'])->name('status');
         });
 
-        // Reports
-        Route::prefix('reports')->name('reports.')->group(function () {
-            Route::get('/', [Tenant\Admin\ReportController::class, 'index'])->name('index');
-            Route::get('/export', [Tenant\Admin\ReportController::class, 'export'])->name('export');
+        Route::middleware(['tenant.manager'])->group(function () {
+            // Reports
+            Route::prefix('reports')->name('reports.')->group(function () {
+                Route::get('/', [Tenant\Admin\ReportController::class, 'index'])->name('index');
+                Route::get('/export', [Tenant\Admin\ReportController::class, 'export'])->name('export');
+            });
+
+            // Menu
+            Route::resource('categories', Tenant\Admin\CategoryController::class);
+            Route::resource('items', Tenant\Admin\ItemController::class);
+            Route::resource('coupons', Tenant\Admin\CouponController::class)->except(['show', 'create', 'edit']);
+            Route::resource('pages', Tenant\Admin\PageController::class)->only(['index', 'edit', 'update']);
+            Route::post('/items/{item}/options', [Tenant\Admin\ItemController::class, 'saveOptions'])->name('items.options');
+
+            // Users / Staff
+            Route::resource('users', Tenant\Admin\UserController::class)->except(['show']);
+
+            // Settings
+            Route::get('/settings', [Tenant\Admin\SettingsController::class, 'index'])->name('settings.index');
+            Route::post('/settings', [Tenant\Admin\SettingsController::class, 'update'])->name('settings.update');
+            Route::get('/settings/stripe', [Tenant\Admin\StripeController::class, 'index'])->name('settings.stripe');
+            Route::post('/settings/stripe/direct', [Tenant\Admin\StripeController::class, 'saveDirectKeys'])->name('settings.stripe.direct');
+            Route::delete('/settings/stripe/direct', [Tenant\Admin\StripeController::class, 'removeDirectKeys'])->name('settings.stripe.direct.remove');
+
+            // Media
+            Route::get('/media', [Tenant\Admin\MediaController::class, 'index'])->name('media.index');
+            Route::post('/media', [Tenant\Admin\MediaController::class, 'store'])->name('media.store');
+            Route::delete('/media/{media}', [Tenant\Admin\MediaController::class, 'destroy'])->name('media.destroy');
         });
-
-        // Menu
-        Route::resource('categories', Tenant\Admin\CategoryController::class);
-        Route::resource('items', Tenant\Admin\ItemController::class);
-        Route::resource('coupons', Tenant\Admin\CouponController::class)->except(['show', 'create', 'edit']);
-        Route::resource('pages', Tenant\Admin\PageController::class)->only(['index', 'edit', 'update']);
-        Route::post('/items/{item}/options', [Tenant\Admin\ItemController::class, 'saveOptions'])->name('items.options');
-
-        // Users / Staff
-        Route::resource('users', Tenant\Admin\UserController::class)->except(['show']);
-
-        // Settings
-        Route::get('/settings', [Tenant\Admin\SettingsController::class, 'index'])->name('settings.index');
-        Route::post('/settings', [Tenant\Admin\SettingsController::class, 'update'])->name('settings.update');
-        Route::get('/settings/stripe', [Tenant\Admin\StripeController::class, 'index'])->name('settings.stripe');
-        Route::post('/settings/stripe/direct', [Tenant\Admin\StripeController::class, 'saveDirectKeys'])->name('settings.stripe.direct');
-        Route::delete('/settings/stripe/direct', [Tenant\Admin\StripeController::class, 'removeDirectKeys'])->name('settings.stripe.direct.remove');
-
-        // Media
-        Route::get('/media', [Tenant\Admin\MediaController::class, 'index'])->name('media.index');
-        Route::post('/media', [Tenant\Admin\MediaController::class, 'store'])->name('media.store');
-        Route::delete('/media/{media}', [Tenant\Admin\MediaController::class, 'destroy'])->name('media.destroy');
     });
 
     // Tenant admin auth
