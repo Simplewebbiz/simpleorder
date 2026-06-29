@@ -33,7 +33,7 @@ return [
 
     'database' => [
         'central_connection' => env('DB_CONNECTION', 'mysql'),
-        'template_tenant_connection' => 'tenant',
+        'template_tenant_connection' => env('TENANCY_TEMPLATE_CONNECTION', env('DB_CONNECTION', 'mysql')),
         'prefix' => env('TENANCY_DB_PREFIX', 'simpleorder_tenant_'),
         'suffix' => '',
         'managers' => [

@@ -60,6 +60,13 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         ];
     }
 
+    public function getInternal($key)
+    {
+        $value = parent::getInternal($key);
+
+        return $value === '' ? null : $value;
+    }
+
     public function plan()
     {
         return $this->belongsTo(Plan::class);
@@ -85,3 +92,4 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         return ['stripe_account' => null]; // platform billing, not connect
     }
 }
+
