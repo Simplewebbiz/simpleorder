@@ -51,6 +51,11 @@
                 </div>
             </div>
 
+            <div v-if="tenantHealth && tenantHealth.database_ready === false" class="warning-card">
+                <strong>Tenant setup issue</strong>
+                <p>{{ tenantHealth.message }}</p>
+            </div>
+
             <h2 class="section-title">Recent Orders (last 50)</h2>
             <table class="sa-table">
                 <thead>
@@ -87,6 +92,7 @@ import { Link } from '@inertiajs/vue3'
 const props = defineProps({
     tenant: Object,
     orders: Array,
+    tenantHealth: Object,
 })
 
 function formatDate(d) {
@@ -128,6 +134,9 @@ function formatDate(d) {
 .info-row span:last-child { color: #111; font-weight: 500; }
 .domain-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f3f4f6; font-size: 14px; }
 .empty-small { color: #9ca3af; font-size: 13px; padding: 8px 0; }
+.warning-card { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; border-radius: 12px; padding: 16px 18px; margin-bottom: 24px; }
+.warning-card strong { display: block; font-size: 14px; margin-bottom: 4px; }
+.warning-card p { margin: 0; font-size: 14px; }
 .section-title { font-size: 16px; font-weight: 700; color: #374151; margin-bottom: 12px; }
 .sa-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb; }
 .sa-table th { background: #f9fafb; text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: #6b7280; }

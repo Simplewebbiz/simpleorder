@@ -8,7 +8,9 @@ use App\Models\Tenant;
 use App\Models\Tenant\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
+use Throwable;
 
 class TenantController extends Controller
 {
@@ -66,13 +68,40 @@ class TenantController extends Controller
 
     public function show(Tenant $tenant)
     {
-        tenancy()->initialize($tenant);
-        $orders = \App\Models\Tenant\Order::with('items')->latest()->limit(50)->get();
-        tenancy()->end();
+        $orders = collect();
+        $tenantHealth = [
+            'database_ready' => true,
+            'message' => null,
+        ];
+
+        try {
+            tenancy()->initialize($tenant);
+
+            if (Schema::hasTable('orders')) {
+                $orders = \App\Models\Tenant\Order::with('items')->latest()->limit(50)->get();
+            } else {
+                $tenantHealth = [
+                    'database_ready' => false,
+                    'message' => 'The tenant database exists, but the order tables are not available yet.',
+                ];
+            }
+        } catch (Throwable $e) {
+            $tenantHealth = [
+                'database_ready' => false,
+                'message' => 'The tenant database could not be opened. This usually means the tenant setup did not finish or its database is missing.',
+            ];
+        } finally {
+            try {
+                tenancy()->end();
+            } catch (Throwable) {
+                // Tenancy was not initialized.
+            }
+        }
 
         return Inertia::render('Platform/SuperAdmin/TenantShow', [
             'tenant' => $tenant->load(['plan', 'domains']),
             'orders' => $orders,
+            'tenantHealth' => $tenantHealth,
         ]);
     }
 
