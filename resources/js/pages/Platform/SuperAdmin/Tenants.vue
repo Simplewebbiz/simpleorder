@@ -19,7 +19,10 @@
         <main class="sa-main">
             <div class="page-header">
                 <h1 class="page-title">Tenants</h1>
-                <input v-model="search" placeholder="Search by name or ID..." class="search-input" />
+                <div class="header-right">
+                    <input v-model="search" placeholder="Search by name or ID..." class="search-input" />
+                    <button @click="openCreate" class="btn-primary">+ New Tenant</button>
+                </div>
             </div>
 
             <div v-if="flash.success" class="alert-success">{{ flash.success }}</div>
@@ -62,18 +65,76 @@
                 </tbody>
             </table>
         </main>
+
+        <!-- Create Tenant Modal -->
+        <div v-if="modal" class="modal-overlay" @click.self="modal = false">
+            <div class="modal">
+                <h2 class="modal-title">New Tenant</h2>
+                <form @submit.prevent="submit">
+                    <div class="field">
+                        <label>Store Name</label>
+                        <input v-model="form.store_name" required placeholder="e.g. Joe's Pizza" />
+                        <div class="err" v-if="errors.store_name">{{ errors.store_name }}</div>
+                    </div>
+                    <div class="field">
+                        <label>Subdomain</label>
+                        <div class="input-suffix">
+                            <input v-model="form.subdomain" required placeholder="joespizza" pattern="[a-z0-9\-]+" />
+                            <span>.simpleorder.biz</span>
+                        </div>
+                        <div class="err" v-if="errors.subdomain">{{ errors.subdomain }}</div>
+                    </div>
+                    <div class="form-row">
+                        <div class="field">
+                            <label>Admin Name</label>
+                            <input v-model="form.name" required />
+                            <div class="err" v-if="errors.name">{{ errors.name }}</div>
+                        </div>
+                        <div class="field">
+                            <label>Admin Email</label>
+                            <input v-model="form.email" type="email" required />
+                            <div class="err" v-if="errors.email">{{ errors.email }}</div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Temporary Password</label>
+                        <input v-model="form.password" type="text" required minlength="8" />
+                        <div class="err" v-if="errors.password">{{ errors.password }}</div>
+                    </div>
+                    <div class="field">
+                        <label>Plan</label>
+                        <select v-model="form.plan_id" required>
+                            <option value="" disabled>Select a plan</option>
+                            <option v-for="plan in plans" :key="plan.id" :value="plan.id">{{ plan.name }}</option>
+                        </select>
+                        <div class="err" v-if="errors.plan_id">{{ errors.plan_id }}</div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" @click="modal = false" class="btn-cancel">Cancel</button>
+                        <button type="submit" class="btn-primary" :disabled="submitting">
+                            {{ submitting ? 'Creating...' : 'Create Tenant' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3'
 
-const props = defineProps({ tenants: Array })
+const props = defineProps({ tenants: Array, plans: Array })
 const page = usePage()
 const flash = page.props.flash ?? {}
+const errors = page.props.errors ?? {}
 
 const search = ref('')
+const modal = ref(false)
+const submitting = ref(false)
+
+const form = reactive({ store_name: '', subdomain: '', name: '', email: '', password: '', plan_id: '' })
 
 const filtered = computed(() => {
     if (!search.value) return props.tenants
@@ -82,6 +143,19 @@ const filtered = computed(() => {
         t.name.toLowerCase().includes(q) || t.id.toLowerCase().includes(q)
     )
 })
+
+function openCreate() {
+    Object.assign(form, { store_name: '', subdomain: '', name: '', email: '', password: '', plan_id: '' })
+    modal.value = true
+}
+
+function submit() {
+    submitting.value = true
+    router.post(route('platform.superadmin.tenants.store'), { ...form, password_confirmation: form.password }, {
+        onFinish: () => { submitting.value = false },
+        onSuccess: () => { modal.value = false },
+    })
+}
 
 function formatDate(d) {
     return d ? new Date(d).toLocaleDateString() : '-'
@@ -124,4 +198,22 @@ function deleteTenant(tenant) {
 .btn-sm.danger { color: #dc2626; }
 .btn-sm.danger:hover { background: #fee2e2; }
 .empty { text-align: center; color: #9ca3af; padding: 40px; }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.btn-primary { background: #e85d04; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.btn-primary:hover:not(:disabled) { background: #c44d03; }
+.btn-primary:disabled { opacity: 0.5; cursor: default; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: flex; align-items: center; justify-content: center; z-index: 50; }
+.modal { background: #fff; border-radius: 16px; padding: 32px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
+.modal-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.field { margin-bottom: 16px; display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: 12px; font-weight: 700; text-transform: uppercase; color: #6b7280; }
+.field input, .field select { border: 1.5px solid #e5e7eb; border-radius: 8px; padding: 8px 12px; font-size: 14px; }
+.field input:focus, .field select:focus { outline: none; border-color: #e85d04; }
+.input-suffix { display: flex; align-items: center; border: 1.5px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+.input-suffix input { border: none; border-radius: 0; flex: 1; }
+.input-suffix span { padding: 8px 12px; background: #f9fafb; color: #6b7280; font-size: 13px; white-space: nowrap; }
+.err { color: #dc2626; font-size: 12px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px; }
+.btn-cancel { background: #f3f4f6; color: #374151; border: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
 </style>
