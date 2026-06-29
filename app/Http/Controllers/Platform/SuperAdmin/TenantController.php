@@ -68,7 +68,7 @@ class TenantController extends Controller
 
     public function show(Tenant $tenant)
     {
-        $orders = collect();
+        $orders = [];
         $tenantHealth = [
             'database_ready' => true,
             'message' => null,
@@ -78,7 +78,26 @@ class TenantController extends Controller
             tenancy()->initialize($tenant);
 
             if (Schema::hasTable('orders')) {
-                $orders = \App\Models\Tenant\Order::with('items')->latest()->limit(50)->get();
+                $orders = \App\Models\Tenant\Order::with('items')
+                    ->latest()
+                    ->limit(50)
+                    ->get()
+                    ->map(fn ($order) => [
+                        'id' => $order->id,
+                        'order_number' => $order->increment_id ?: $order->id,
+                        'customer_name' => trim($order->contact_firstname . ' ' . $order->contact_lastname) ?: null,
+                        'customer_email' => $order->contact_email,
+                        'status' => $order->status,
+                        'total' => (float) $order->total,
+                        'items' => $order->items->map(fn ($item) => [
+                            'id' => $item->id,
+                            'name' => $item->name,
+                            'qty' => $item->qty,
+                        ])->values()->all(),
+                        'created_at' => optional($order->created_at)->toISOString(),
+                    ])
+                    ->values()
+                    ->all();
             } else {
                 $tenantHealth = [
                     'database_ready' => false,
@@ -117,3 +136,4 @@ class TenantController extends Controller
         return redirect()->route('platform.dashboard');
     }
 }
+

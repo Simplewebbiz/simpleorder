@@ -73,7 +73,7 @@
                         <td>{{ order.order_number ?? order.id }}</td>
                         <td>{{ order.customer_name ?? order.customer_email ?? '-' }}</td>
                         <td><span :class="['badge', order.status]">{{ order.status }}</span></td>
-                        <td>${{ ((order.total ?? 0) / 100).toFixed(2) }}</td>
+                        <td>${{ Number(order.total ?? 0).toFixed(2) }}</td>
                         <td>{{ order.items?.length ?? 0 }}</td>
                         <td>{{ formatDate(order.created_at) }}</td>
                     </tr>
@@ -143,3 +143,4 @@ function formatDate(d) {
 .sa-table td { padding: 12px 16px; border-top: 1px solid #f3f4f6; font-size: 14px; }
 .empty { text-align: center; color: #9ca3af; padding: 40px; }
 </style>
+

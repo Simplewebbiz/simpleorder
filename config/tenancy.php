@@ -33,7 +33,7 @@ return [
 
     'database' => [
         'central_connection' => env('DB_CONNECTION', 'mysql'),
-        'template_tenant_connection' => null,
+        'template_tenant_connection' => 'tenant',
         'prefix' => env('TENANCY_DB_PREFIX', 'simpleorder_tenant_'),
         'suffix' => '',
         'managers' => [
@@ -80,3 +80,4 @@ return [
         '--class' => 'TenantDatabaseSeeder',
     ],
 ];
+
