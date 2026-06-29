@@ -31,5 +31,21 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->render(function (
+            \Stancl\Tenancy\Exceptions\TenantCouldNotBeIdentifiedOnDomainException $e,
+            \Illuminate\Http\Request $request
+        ) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'No storefront is configured for this domain.',
+                ], 404);
+            }
+
+            return response()->view('errors.tenant-not-found', [
+                'domain' => $request->getHost(),
+                'platformUrl' => config('app.url'),
+            ], 404);
+        });
     })->create();
+
+
