@@ -116,16 +116,16 @@ onMounted(() => {
     const tenantId = page.props.auth?.tenant?.id || page.props.auth?.tenant_user?.tenant_id
     if (!window.Echo || !tenantId) return
 
-    channel = window.Echo.channel('admin.' + tenantId + '.orders')
+    channel = window.Echo.private('admin.' + tenantId + '.orders')
         .listen('.order-placed', (event) => {
-            newOrderAlert.value = event.order
+            newOrderAlert.value = event.order || event
             router.reload({ only: ['stats', 'recentOrders', 'pendingOrders'] })
         })
 })
 
 onUnmounted(() => {
     const tenantId = page.props.auth?.tenant?.id || page.props.auth?.tenant_user?.tenant_id
-    if (channel && window.Echo && tenantId) window.Echo.leaveChannel('admin.' + tenantId + '.orders')
+    if (channel && window.Echo && tenantId) window.Echo.leave('admin.' + tenantId + '.orders')
 })
 
 function viewOrder(order) {

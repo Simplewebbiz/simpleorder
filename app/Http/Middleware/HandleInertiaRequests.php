@@ -36,6 +36,10 @@ class HandleInertiaRequests extends Middleware
                 'hours'   => Setting::get('store_hours', []),
             ];
             $shared['auth']['tenant_user'] = $request->user('tenant');
+            $shared['auth']['tenant'] = [
+                'id' => tenant()->id,
+                'name' => tenant()->name,
+            ];
         }
 
         if ($request->user('platform')) {

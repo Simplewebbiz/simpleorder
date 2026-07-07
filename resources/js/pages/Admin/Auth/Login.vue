@@ -42,7 +42,7 @@ const form = reactive({ email: '', password: '' })
 
 function submit() {
     submitting.value = true
-    router.post(route('tenant.admin.login'), form, {
+    router.post(route('tenant.admin.login.post'), form, {
         onFinish: () => { submitting.value = false },
         onError: () => { form.password = '' },
     })

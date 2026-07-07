@@ -99,18 +99,25 @@ export function isStoreOpen(settings) {
     const now = new Date(new Date().toLocaleString('en-US', { timeZone: tz }))
     const days = ['su', 'mo', 'tu', 'we', 'th', 'fr', 'sa']
     const dayKey = days[now.getDay()]
-    const hours = settings.store_hours[dayKey]
+    const previousDayKey = days[(now.getDay() + 6) % 7]
+    const nowMins = now.getHours() * 60 + now.getMinutes()
+
+    return isOpenForHours(settings.store_hours[dayKey], nowMins)
+        || isOpenForHours(settings.store_hours[previousDayKey], nowMins, true)
+}
+
+function isOpenForHours(hours, nowMins, fromPreviousDay = false) {
     if (!hours || hours.closed) return false
     if (!hours.from || !hours.to) return false
     const from = parseTime(hours.from)
     const to = parseTime(hours.to)
     if (!from || !to) return false
 
-    const nowMins = now.getHours() * 60 + now.getMinutes()
     const fromMins = from[0] * 60 + from[1]
     const toMins = to[0] * 60 + to[1]
 
-    if (toMins < fromMins) return nowMins >= fromMins || nowMins <= toMins
+    if (toMins < fromMins) return fromPreviousDay ? nowMins <= toMins : nowMins >= fromMins
+    if (fromPreviousDay) return false
     return nowMins >= fromMins && nowMins <= toMins
 }
 

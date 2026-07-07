@@ -6,6 +6,14 @@ return [
     'default' => env('DB_CONNECTION', 'mysql'),
 
     'connections' => [
+        'sqlite' => [
+            'driver' => 'sqlite',
+            'url' => env('DB_URL'),
+            'database' => env('DB_DATABASE', database_path('database.sqlite')),
+            'prefix' => '',
+            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+        ],
+
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),
@@ -35,6 +43,26 @@ return [
             'username' => env('TENANT_DB_USERNAME', env('DB_USERNAME', 'root')),
             'password' => env('TENANT_DB_PASSWORD', env('DB_PASSWORD', '')),
             'unix_socket' => env('TENANT_DB_SOCKET', env('DB_SOCKET', '')),
+            'charset' => env('DB_CHARSET', 'utf8mb4'),
+            'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
+        'tenant_template' => [
+            'driver' => env('TENANCY_DB_CONNECTION', 'mysql'),
+            'url' => env('TENANCY_DB_URL', env('TENANT_DB_URL')),
+            'host' => env('TENANCY_DB_HOST', env('TENANT_DB_HOST', env('DB_HOST', '127.0.0.1'))),
+            'port' => env('TENANCY_DB_PORT', env('TENANT_DB_PORT', env('DB_PORT', '3306'))),
+            'database' => null,
+            'username' => env('TENANCY_DB_USERNAME', env('TENANT_DB_USERNAME', env('DB_USERNAME', 'root'))),
+            'password' => env('TENANCY_DB_PASSWORD', env('TENANT_DB_PASSWORD', env('DB_PASSWORD', ''))),
+            'unix_socket' => env('TENANCY_DB_SOCKET', env('TENANT_DB_SOCKET', env('DB_SOCKET', ''))),
             'charset' => env('DB_CHARSET', 'utf8mb4'),
             'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
             'prefix' => '',

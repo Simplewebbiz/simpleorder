@@ -17,9 +17,11 @@ class StoreAvailabilityService
         $now = CarbonImmutable::now($timezone);
         $dayKey = self::DAYS[$now->dayOfWeek];
         $today = $hours[$dayKey] ?? null;
+        $previousDayKey = self::DAYS[$now->subDay()->dayOfWeek];
+        $previousDay = $hours[$previousDayKey] ?? null;
         $allowPickup = (bool) Setting::get('allow_pickup', true);
         $allowDelivery = (bool) Setting::get('allow_delivery', true);
-        $open = $this->isOpenForDay($today, $now) && ($allowPickup || $allowDelivery);
+        $open = ($this->isOpenForDay($today, $now) || $this->isOpenFromPreviousDay($previousDay, $now)) && ($allowPickup || $allowDelivery);
 
         return [
             'open' => $open,
@@ -88,10 +90,28 @@ class StoreAvailabilityService
         $current = ($now->hour * 60) + $now->minute;
 
         if ($to < $from) {
-            return $current >= $from || $current <= $to;
+            return $current >= $from;
         }
 
         return $current >= $from && $current <= $to;
+    }
+
+    private function isOpenFromPreviousDay(?array $hours, CarbonImmutable $now): bool
+    {
+        if (! $hours || ! empty($hours['closed'])) {
+            return false;
+        }
+
+        $from = $this->minutesFromTime($hours['from'] ?? null);
+        $to = $this->minutesFromTime($hours['to'] ?? null);
+
+        if ($from === null || $to === null || $to >= $from) {
+            return false;
+        }
+
+        $current = ($now->hour * 60) + $now->minute;
+
+        return $current <= $to;
     }
 
     private function minutesFromTime(?string $time): ?int
