@@ -35,7 +35,7 @@ class HandleInertiaRequests extends Middleware
                 'email'   => Setting::get('order_email', ''),
                 'hours'   => Setting::get('store_hours', []),
             ];
-            $shared['auth']['tenant_user'] = $request->user('tenant');
+            $shared['auth']['tenant_user'] = $this->tenantUser($request);
             $shared['auth']['tenant'] = [
                 'id' => tenant()->id,
                 'name' => tenant()->name,
@@ -48,5 +48,15 @@ class HandleInertiaRequests extends Middleware
         }
 
         return $shared;
+    }
+
+    private function tenantUser(Request $request)
+    {
+        try {
+            return $request->user('tenant');
+        } catch (\Throwable) {
+            auth('tenant')->logout();
+            return null;
+        }
     }
 }

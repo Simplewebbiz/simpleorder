@@ -41,6 +41,12 @@ Route::middleware([
         Route::get('/tenant-media/{file}', [Tenant\MediaController::class, 'serve'])->where('file', '.*')->name('media.serve');
     });
 
+    // Tenant admin auth
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/login', [Tenant\Admin\AuthController::class, 'showLogin'])->name('login');
+        Route::post('/login', [Tenant\Admin\AuthController::class, 'login'])->name('login.post');
+        Route::post('/logout', [Tenant\Admin\AuthController::class, 'logout'])->name('logout')->middleware('auth:tenant');
+    });
     // Tenant Admin Panel
     Route::prefix('admin')->name('admin.')->middleware(['auth:tenant', 'tenant.admin'])->group(function () {
 
@@ -84,12 +90,6 @@ Route::middleware([
         });
     });
 
-    // Tenant admin auth
-    Route::prefix('admin')->name('admin.')->group(function () {
-        Route::get('/login', [Tenant\Admin\AuthController::class, 'showLogin'])->name('login');
-        Route::post('/login', [Tenant\Admin\AuthController::class, 'login'])->name('login.post');
-        Route::post('/logout', [Tenant\Admin\AuthController::class, 'logout'])->name('logout')->middleware('auth:tenant');
-    });
 
     // Storefront SPA fallback. Keep this after admin routes so /admin/* is not swallowed.
     Route::middleware(['tenant.subscription'])
