@@ -13,7 +13,6 @@ $bootstrappers = [
     class_exists(Stancl\Tenancy\Bootstrappers\CacheTagsBootstrapper::class)
         ? Stancl\Tenancy\Bootstrappers\CacheTagsBootstrapper::class
         : null,
-    Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper::class,
     Stancl\Tenancy\Bootstrappers\QueueTenancyBootstrapper::class,
 ];
 

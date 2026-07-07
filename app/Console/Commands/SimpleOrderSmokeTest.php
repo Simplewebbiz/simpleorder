@@ -68,6 +68,7 @@ class SimpleOrderSmokeTest extends Command
         $this->passIf((bool) $tenantTemplateDriver, 'Tenant database driver is configured', 'Tenant DB template connection must point to a configured connection such as tenant.');
         $tenantDatabaseManager = $tenantTemplateDriver ? config("tenancy.database.managers.{$tenantTemplateDriver}") : null;
         $this->passIf((bool) $tenantDatabaseManager, 'Tenant database manager is configured', 'Tenant DB driver must have a matching Stancl tenancy database manager.');
+        $this->passIf(! in_array(Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper::class, config('tenancy.bootstrappers', []), true), 'Filesystem tenancy bootstrapper is disabled', 'This cPanel build uses normal Laravel local/public disks for tenant media.');
         $this->passIf(File::exists(public_path('build/manifest.json')), 'Frontend build manifest exists', 'Run npm run build.');
     }
 

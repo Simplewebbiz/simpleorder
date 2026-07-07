@@ -64,7 +64,15 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     {
         $value = parent::getInternal($key);
 
-        return $value === '' ? null : $value;
+        if ($value === '') {
+            $value = null;
+        }
+
+        if (in_array($key, ['tenancy_db_connection', 'db_connection'], true) && $value === null) {
+            return 'mysql';
+        }
+
+        return $value;
     }
 
     public function plan()
