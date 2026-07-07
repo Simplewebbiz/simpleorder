@@ -65,7 +65,7 @@ class SimpleOrderSmokeTest extends Command
         $this->passIf(config('session.driver') === 'file', 'Session driver is file', 'SESSION_DRIVER should be file on this cPanel install unless you create the sessions table.');
         $tenantTemplateConnection = config('tenancy.database.template_tenant_connection');
         $tenantTemplateDriver = $tenantTemplateConnection ? config("database.connections.{$tenantTemplateConnection}.driver") : null;
-        $this->passIf((bool) $tenantTemplateDriver, 'Tenant database driver is configured', 'Set TENANCY_DB_TEMPLATE_CONNECTION=tenant_template and make sure config/database.php exists.');
+        $this->passIf((bool) $tenantTemplateDriver, 'Tenant database driver is configured', 'Tenant DB template connection must point to a configured connection such as tenant.');
         $tenantDatabaseManager = $tenantTemplateDriver ? config("tenancy.database.managers.{$tenantTemplateDriver}") : null;
         $this->passIf((bool) $tenantDatabaseManager, 'Tenant database manager is configured', 'Tenant DB driver must have a matching Stancl tenancy database manager.');
         $this->passIf(File::exists(public_path('build/manifest.json')), 'Frontend build manifest exists', 'Run npm run build.');
