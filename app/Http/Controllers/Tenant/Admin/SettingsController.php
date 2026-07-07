@@ -43,6 +43,7 @@ class SettingsController extends Controller
             'food_charge'      => 'required|numeric|min:0',
             'grocery_charge'   => 'required|numeric|min:0',
             'order_email'      => 'nullable|email',
+            'hero_image_url'   => 'nullable|string|max:1000',
             'review_url'       => 'nullable|url|max:500',
             'review_request_enabled' => 'boolean',
             'review_request_message' => 'nullable|string|max:300',

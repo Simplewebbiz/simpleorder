@@ -49,6 +49,7 @@ class Setting extends Model
             'food_charge'      => '0.00',
             'grocery_charge'   => '0.00',
             'order_email'      => '',
+            'hero_image_url'   => '',
             'review_url'       => '',
             'review_request_enabled' => true,
             'review_request_message' => 'If you enjoyed your order, a quick review helps our restaurant grow.',

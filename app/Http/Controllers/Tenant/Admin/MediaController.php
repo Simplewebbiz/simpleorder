@@ -36,7 +36,7 @@ class MediaController extends Controller
         $request->validate([
             'file' => 'required|file|mimes:jpeg,jpg,png,gif,webp,svg|max:5120',
             'alt' => 'nullable|string|max:200',
-            'folder' => 'nullable|string|in:general,logos,items,categories,pages',
+            'folder' => 'nullable|string|in:general,logos,items,categories,pages,storefront',
         ]);
 
         $file = $request->file('file');

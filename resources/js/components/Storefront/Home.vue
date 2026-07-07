@@ -1,6 +1,6 @@
 <template>
     <div class="storefront-home">
-        <section class="hero" :style="heroStyle">
+        <section class="hero" :class="{ 'has-image': hasHeroImage }" :style="heroStyle">
             <div class="hero-content">
                 <div class="hero-copy">
                     <p class="eyebrow">Fresh online ordering</p>
@@ -70,14 +70,19 @@ const inertiaPage = usePage()
 const brand = inertiaPage.props.tenant_brand || {}
 const storeOpen = computed(() => isStoreOpen(props.settings))
 
-const heroStyle = computed(() => {
-    if (props.page?.hero?.permalink) {
-        return { backgroundImage: `linear-gradient(90deg, rgba(255,247,237,.96), rgba(255,247,237,.8)), url(${props.page.hero.permalink})` }
-    }
+const heroImage = computed(() => {
+    if (props.settings?.hero_image_url) return props.settings.hero_image_url
+    if (props.page?.hero?.permalink) return props.page.hero.permalink
 
     const firstCatWithImage = props.menu?.find(c => c.image)
-    if (firstCatWithImage?.image?.permalink) {
-        return { backgroundImage: `linear-gradient(90deg, rgba(255,247,237,.96), rgba(255,247,237,.78)), url(${firstCatWithImage.image.permalink})` }
+    return firstCatWithImage?.image?.permalink || ''
+})
+
+const hasHeroImage = computed(() => Boolean(heroImage.value))
+
+const heroStyle = computed(() => {
+    if (heroImage.value) {
+        return { backgroundImage: `linear-gradient(90deg, rgba(23,39,43,.72), rgba(23,39,43,.34)), url(${heroImage.value})` }
     }
 
     return {}
@@ -101,6 +106,12 @@ function stripTags(html) {
 h1 { color: #17272b; font-size: 58px; line-height: 1.02; font-weight: 900; max-width: 720px; }
 .hero-sub { color: #405257; font-size: 20px; line-height: 1.6; max-width: 650px; margin-top: 20px; }
 .hero-sub.closed { color: #be123c; }
+.hero.has-image .eyebrow,
+.hero.has-image h1,
+.hero.has-image .hero-sub { color: #fff; text-shadow: 0 2px 18px rgba(0,0,0,.28); }
+.hero.has-image .hero-sub.closed { color: #fecdd3; }
+.hero.has-image .hero-secondary { background: rgba(255,255,255,.94); }
+.hero.has-image .hero-cta { box-shadow: 0 14px 28px rgba(0,0,0,.18); }
 .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; }
 .hero-cta, .hero-secondary { border-radius: 8px; padding: 14px 22px; font-size: 15px; font-weight: 900; text-decoration: none; cursor: pointer; }
 .hero-cta { background: #ff7a59; color: #fff; border: none; }

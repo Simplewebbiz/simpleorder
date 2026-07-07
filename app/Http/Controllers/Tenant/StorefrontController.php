@@ -32,6 +32,7 @@ class StorefrontController extends Controller
             'store_name'     => Setting::get('store_name', 'SimpleOrder'),
             'store_address'  => Setting::get('store_address'),
             'store_phone'    => Setting::get('store_phone'),
+            'hero_image_url' => Setting::get('hero_image_url', ''),
             'store_hours'    => Setting::get('store_hours', Setting::defaults()['store_hours']),
             'tax_rate'       => Setting::get('tax_rate', 0),
             'food_charge'    => Setting::get('food_charge', 0),
