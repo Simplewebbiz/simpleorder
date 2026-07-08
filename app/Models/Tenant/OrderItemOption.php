@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrderItemOption extends Model
 {
+    protected $connection = 'tenant';
+
     public $timestamps = false;
     protected $fillable = ['order_item_id', 'label'];
 

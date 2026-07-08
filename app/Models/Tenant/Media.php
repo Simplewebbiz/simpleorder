@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Media extends Model
 {
+    protected $connection = 'tenant';
+
     protected $fillable = ['name', 'alt', 'src', 'mime', 'size', 'folder'];
 
     public function getPermalinkAttribute(): string

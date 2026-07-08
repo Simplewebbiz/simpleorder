@@ -9,6 +9,8 @@ class Category extends Model
 {
     use SoftDeletes;
 
+    protected $connection = 'tenant';
+
     protected $fillable = ['name', 'slug', 'description', 'image_id', 'sort', 'is_active'];
 
     protected $casts = ['is_active' => 'boolean'];

@@ -9,6 +9,8 @@ class Order extends Model
 {
     use SoftDeletes;
 
+    protected $connection = 'tenant';
+
     protected $fillable = [
         'increment_id', 'key', 'user_id', 'cart_id', 'method', 'status',
         'contact_firstname', 'contact_lastname', 'contact_email', 'contact_phone',

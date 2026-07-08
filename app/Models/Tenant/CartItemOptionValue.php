@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class CartItemOptionValue extends Model
 {
+    protected $connection = 'tenant';
+
     public $timestamps = false;
 
     protected $fillable = ['cart_item_option_id', 'item_option_value_id'];

@@ -10,6 +10,8 @@ class User extends Authenticatable
 {
     use Notifiable, SoftDeletes;
 
+    protected $connection = 'tenant';
+
     protected $fillable = ['name', 'email', 'password', 'role', 'phone'];
 
     protected $hidden = ['password', 'remember_token'];

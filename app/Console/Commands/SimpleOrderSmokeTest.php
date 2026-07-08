@@ -218,7 +218,23 @@ class SimpleOrderSmokeTest extends Command
                 $this->passIf(Schema::hasTable($table), "Tenant table exists for {$tenant->id}: {$table}", 'Run tenants:migrate.');
             }
 
+            foreach ([
+                \App\Models\Tenant\User::class,
+                \App\Models\Tenant\Order::class,
+                \App\Models\Tenant\Setting::class,
+                \App\Models\Tenant\Page::class,
+                \App\Models\Tenant\Category::class,
+                \App\Models\Tenant\Item::class,
+            ] as $modelClass) {
+                $this->passIf(
+                    (new $modelClass())->getConnectionName() === 'tenant',
+                    class_basename($modelClass) . ' model uses tenant connection',
+                    'Tenant Eloquent models must use the tenant database connection.'
+                );
+            }
+
             if (Schema::hasTable('users')) {
+                $this->passIf(\App\Models\Tenant\User::query()->count() >= 0, "Tenant {$tenant->id} Eloquent user query works", 'Tenant admin login may fail if Eloquent uses the central database.');
                 $this->passIf(DB::table('users')->count() > 0, "Tenant {$tenant->id} has at least one user", 'Tenant admin login needs a user.');
                 $this->passIf(DB::table('users')->whereIn('role', ['owner', 'manager'])->exists(), "Tenant {$tenant->id} has an admin user", 'Create an owner or manager user for the restaurant admin.');
             }

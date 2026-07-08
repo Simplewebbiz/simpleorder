@@ -8,6 +8,8 @@ use Illuminate\Support\Str;
 
 class Page extends Model
 {
+    protected $connection = 'tenant';
+
     protected $fillable = [
         'name',
         'title',

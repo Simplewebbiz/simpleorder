@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
 {
+    protected $connection = 'tenant';
+
     protected $primaryKey = 'key';
     public $incrementing = false;
     protected $keyType = 'string';

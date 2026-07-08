@@ -9,6 +9,8 @@ class Item extends Model
 {
     use SoftDeletes;
 
+    protected $connection = 'tenant';
+
     protected $fillable = [
         'name', 'sku', 'description', 'price', 'taxable',
         'type', 'image_id', 'sort', 'is_active',

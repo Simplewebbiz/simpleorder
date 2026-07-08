@@ -9,6 +9,8 @@ class ItemOption extends Model
 {
     use SoftDeletes;
 
+    protected $connection = 'tenant';
+
     protected $fillable = ['item_id', 'label', 'required', 'input_type', 'sort'];
 
     protected $casts = ['required' => 'boolean'];

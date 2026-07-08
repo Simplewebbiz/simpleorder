@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class CartItem extends Model
 {
+    protected $connection = 'tenant';
+
     protected $fillable = ['cart_id', 'item_id', 'qty', 'comments'];
 
     public function item()

@@ -9,6 +9,8 @@ class ItemOptionValue extends Model
 {
     use SoftDeletes;
 
+    protected $connection = 'tenant';
+
     protected $fillable = ['item_option_id', 'label', 'price', 'price_type', 'sort'];
 
     protected $casts = ['price' => 'decimal:2'];

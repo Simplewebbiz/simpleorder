@@ -9,6 +9,8 @@ class Cart extends Model
 {
     use SoftDeletes;
 
+    protected $connection = 'tenant';
+
     protected $fillable = [
         'user_id', 'session_key', 'method',
         'delivery_address', 'delivery_city', 'delivery_state', 'delivery_zip',

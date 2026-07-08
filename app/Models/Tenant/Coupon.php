@@ -10,6 +10,8 @@ class Coupon extends Model
 {
     use SoftDeletes;
 
+    protected $connection = 'tenant';
+
     protected $fillable = [
         'name',
         'code',
