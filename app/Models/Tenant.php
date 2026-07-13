@@ -69,7 +69,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         }
 
         if (in_array($key, ['tenancy_db_connection', 'db_connection'], true) && $value === null) {
-            return 'mysql';
+            return 'tenant';
         }
 
         return $value;
