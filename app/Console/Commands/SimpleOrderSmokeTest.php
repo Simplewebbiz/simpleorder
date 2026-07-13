@@ -66,7 +66,9 @@ class SimpleOrderSmokeTest extends Command
         $tenantTemplateConnection = config('tenancy.database.template_tenant_connection');
         $tenantTemplateDriver = $tenantTemplateConnection ? config("database.connections.{$tenantTemplateConnection}.driver") : null;
         $this->passIf((bool) $tenantTemplateDriver, 'Tenant database driver is configured', 'Tenant DB template connection must point to a configured connection such as tenant.');
-        $this->passIf((new Tenant(['id' => 'smoke']))->getInternal('tenancy_db_connection') === $tenantTemplateConnection, 'Tenant model uses template tenant connection', 'Tenant database fallback must match tenancy.database.template_tenant_connection.');
+        $smokeTenant = new Tenant(['id' => 'smoke']);
+        $this->passIf($smokeTenant->getInternal('db_connection') === $tenantTemplateConnection, 'Tenant model db connection matches template connection', 'Tenant database fallback must match tenancy.database.template_tenant_connection.');
+        $this->passIf($smokeTenant->getInternal('tenancy_db_connection') === $tenantTemplateConnection, 'Tenant model tenancy db connection matches template connection', 'Tenant database fallback must match tenancy.database.template_tenant_connection.');
         $tenantDatabaseManager = $tenantTemplateDriver ? config("tenancy.database.managers.{$tenantTemplateDriver}") : null;
         $this->passIf((bool) $tenantDatabaseManager, 'Tenant database manager is configured', 'Tenant DB driver must have a matching Stancl tenancy database manager.');
         $this->passIf(! in_array(Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper::class, config('tenancy.bootstrappers', []), true), 'Filesystem tenancy bootstrapper is disabled', 'This cPanel build uses normal Laravel local/public disks for tenant media.');
