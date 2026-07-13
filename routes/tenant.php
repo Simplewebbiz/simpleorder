@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Tenant;
-use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use App\Http\Middleware\InitializeTenancyByDomainOrShowNotConfigured;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 // All tenant routes share these middleware
 Route::middleware([
     PreventAccessFromCentralDomains::class,
-    InitializeTenancyByDomain::class,
+    InitializeTenancyByDomainOrShowNotConfigured::class,
 ])->name('tenant.')->group(function () {
 
     // Customer-facing ordering endpoints
