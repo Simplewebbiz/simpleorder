@@ -38,6 +38,7 @@ Route::prefix('superadmin')->name('platform.superadmin.')->middleware(['auth:pla
     Route::resource('tenants', Platform\SuperAdmin\TenantController::class)->names('tenants');
     Route::resource('plans', Platform\SuperAdmin\PlanController::class)->names('plans');
     Route::resource('marketing-pages', Platform\SuperAdmin\MarketingPageController::class)->only(['index', 'update'])->names('marketing-pages');
+    Route::post('/marketing-pages/hero-image', [Platform\SuperAdmin\MarketingPageController::class, 'uploadHeroImage'])->name('marketing-pages.hero-image');
     Route::post('/tenants/{tenant}/impersonate', [Platform\SuperAdmin\TenantController::class, 'impersonate'])->name('tenants.impersonate');
 
     Route::get('/settings', [Platform\SuperAdmin\PlatformSettingsController::class, 'index'])->name('settings');

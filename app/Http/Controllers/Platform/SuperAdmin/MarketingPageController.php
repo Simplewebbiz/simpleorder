@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\MarketingPage;
 use App\Support\Html;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Intervention\Image\Laravel\Facades\Image;
 
 class MarketingPageController extends Controller
 {
@@ -41,5 +44,20 @@ class MarketingPageController extends Controller
         $marketingPage->update($data);
 
         return redirect()->route('platform.superadmin.marketing-pages.index')->with('success', 'Website page updated.');
+    }
+
+    public function uploadHeroImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,jpg,png,webp|max:5120',
+        ]);
+
+        $file = $request->file('image');
+        $path = 'marketing/hero/' . Str::uuid() . '.' . strtolower($file->getClientOriginalExtension());
+
+        $image = Image::read($file)->scaleDown(width: 2000);
+        Storage::disk('public')->put($path, (string) $image->encode());
+
+        return response()->json(['url' => Storage::url($path)]);
     }
 }

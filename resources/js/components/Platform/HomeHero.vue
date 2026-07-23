@@ -27,7 +27,7 @@
             <div class="home-hero__media">
                 <img
                     :src="heroImage"
-                    alt="A diverse group of friends leaning on a table together, laughing and chatting over drinks at a casual outdoor bar patio"
+                    alt="A diverse group of friends laughing together while sharing pizza, burgers, fries, and drinks at a colorful, casual restaurant"
                     loading="eager"
                     width="1200"
                     height="800"
@@ -46,7 +46,7 @@ import { computed } from 'vue'
 
 const props = defineProps({ heroImageUrl: { type: String, default: '' } })
 
-const fallbackImage = 'https://images.unsplash.com/photo-1565128540506-e43171f3ca5e?auto=format&fit=crop&w=1400&q=80'
+const fallbackImage = '/images/marketing/hero-friends.jpg'
 const heroImage = computed(() => props.heroImageUrl || fallbackImage)
 </script>
 
