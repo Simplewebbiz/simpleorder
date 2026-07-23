@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Tenant\{Cart, Coupon, Order, OrderItem, OrderItemOption, OrderItemOptionValue, Setting};
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Stripe\StripeClient;
 
 class OrderService
@@ -68,7 +69,26 @@ class OrderService
 
         $totals = app(CartService::class)->calculateTotal($cart);
 
+        if (empty($cart->stripe_intent)) {
+            throw ValidationException::withMessages([
+                'payment' => ['Payment has not been completed for this order.'],
+            ]);
+        }
+
         $intent = $this->stripe->paymentIntents->retrieve($cart->stripe_intent);
+
+        if ($intent->status !== 'succeeded') {
+            throw ValidationException::withMessages([
+                'payment' => ['Payment has not been completed for this order.'],
+            ]);
+        }
+
+        if ((int) $intent->amount !== (int) round($totals['total'] * 100)) {
+            throw ValidationException::withMessages([
+                'payment' => ['Your order total changed since payment was submitted. Please try again.'],
+            ]);
+        }
+
         $charge = null;
 
         if (! empty($intent->latest_charge)) {

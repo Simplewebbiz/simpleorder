@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Platform\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\MarketingPage;
+use App\Support\Html;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -35,19 +36,10 @@ class MarketingPageController extends Controller
         ]);
 
         $data['slug'] = MarketingPage::uniqueSlug($data['slug'], $marketingPage->id);
-        $data['content'] = $this->cleanHtml($data['content'] ?? '');
+        $data['content'] = Html::clean($data['content'] ?? '');
 
         $marketingPage->update($data);
 
         return redirect()->route('platform.superadmin.marketing-pages.index')->with('success', 'Website page updated.');
-    }
-
-    private function cleanHtml(string $html): string
-    {
-        $html = strip_tags($html, '<p><br><strong><b><em><i><u><h2><h3><h4><ul><ol><li><a><img><blockquote>');
-        $html = preg_replace('/\s+on[a-z]+\s*=\s*(".*?"|\'.*?\'|[^\s>]+)/i', '', $html) ?? '';
-        $html = preg_replace('/javascript\s*:/i', '', $html) ?? '';
-
-        return $html;
     }
 }

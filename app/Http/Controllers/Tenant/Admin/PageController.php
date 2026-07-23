@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Tenant\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Page;
+use App\Support\Html;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -41,19 +42,10 @@ class PageController extends Controller
         $data['slug'] = $data['slug']
             ? Page::uniqueSlug($data['slug'], $page->id)
             : Page::uniqueSlug($data['title'], $page->id);
-        $data['content'] = $this->cleanHtml($data['content'] ?? '');
+        $data['content'] = Html::clean($data['content'] ?? '');
 
         $page->update($data);
 
         return redirect()->route('tenant.admin.pages.index')->with('success', 'Page updated.');
-    }
-
-    private function cleanHtml(string $html): string
-    {
-        $html = strip_tags($html, '<p><br><strong><b><em><i><u><h2><h3><h4><ul><ol><li><a><img><blockquote>');
-        $html = preg_replace('/\s+on[a-z]+\s*=\s*(".*?"|\'.*?\'|[^\s>]+)/i', '', $html) ?? '';
-        $html = preg_replace('/javascript\s*:/i', '', $html) ?? '';
-
-        return $html;
     }
 }

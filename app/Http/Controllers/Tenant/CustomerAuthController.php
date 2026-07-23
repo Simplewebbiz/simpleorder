@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
-use App\Models\Tenant\Customer;
 use App\Models\Tenant\Order;
+use App\Models\Tenant\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -15,14 +15,15 @@ class CustomerAuthController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:customers,email',
+            'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8|confirmed',
         ]);
 
-        $customer = Customer::create([
+        $customer = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'role' => User::ROLE_CUSTOMER,
         ]);
 
         Auth::guard('tenant')->login($customer);
@@ -52,7 +53,7 @@ class CustomerAuthController extends Controller
 
     public function orders(Request $request)
     {
-        $orders = Order::where('customer_email', Auth::guard('tenant')->user()->email)
+        $orders = Order::where('user_id', Auth::guard('tenant')->id())
             ->latest()
             ->get();
 

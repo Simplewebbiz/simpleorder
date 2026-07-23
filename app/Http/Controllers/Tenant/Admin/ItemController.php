@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tenant\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Category;
 use App\Models\Tenant\Item;
+use App\Support\Html;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -120,7 +121,7 @@ class ItemController extends Controller
         return [
             'name' => $data['name'],
             'sku' => $data['sku'] ?? null,
-            'description' => $data['description'] ?? null,
+            'description' => isset($data['description']) ? Html::clean($data['description']) : null,
             'price' => $data['price'],
             'type' => $data['type'] ?? 'food',
             'taxable' => $data['taxable'] ?? true,

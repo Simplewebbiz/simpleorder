@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Tenant\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Category;
+use App\Support\Html;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -58,13 +59,19 @@ class CategoryController extends Controller
 
     private function validated(Request $request): array
     {
-        return $request->validate([
+        $data = $request->validate([
             'name' => 'required|string|max:100',
             'description' => 'nullable|string',
             'image_id' => 'nullable|exists:media,id',
             'is_active' => 'boolean',
             'sort' => 'integer|min:0',
         ]);
+
+        if (isset($data['description'])) {
+            $data['description'] = Html::clean($data['description']);
+        }
+
+        return $data;
     }
 
     private function uniqueSlug(string $name, ?int $ignoreId = null): string
