@@ -75,9 +75,13 @@
                         </div>
 
                         <div class="field">
-                            <label>Hero Image URL</label>
+                            <label>Hero Image</label>
+                            <div class="hero-upload-row">
+                                <input type="file" accept="image/jpeg,image/png,image/webp" @change="onHeroFileChange" />
+                                <span v-if="uploadingHero" class="hero-upload-status">Uploading...</span>
+                            </div>
                             <input v-model="form.hero_image_url" placeholder="https://... food or people image" />
-                            <small>Use a bright food or restaurant people image. Unsplash image URLs work well.</small>
+                            <small>Upload an image, or paste an image URL directly. Uploads replace the URL above.</small>
                         </div>
 
                         <div class="field">
@@ -117,6 +121,7 @@
 <script setup>
 import { computed, reactive, ref } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3'
+import axios from 'axios'
 import MarketingEditor from '../../../components/Platform/MarketingEditor.vue'
 
 const props = defineProps({ pages: Array })
@@ -124,6 +129,7 @@ const page = usePage()
 const flash = page.props.flash ?? {}
 const selected = ref(props.pages?.[0] || null)
 const saving = ref(false)
+const uploadingHero = ref(false)
 
 const form = reactive(blank(selected.value))
 const previewUrl = computed(() => selected.value?.slug === 'home' ? '/' : '/' + selected.value?.slug)
@@ -147,6 +153,23 @@ function blank(pageItem = null) {
 function select(pageItem) {
     selected.value = pageItem
     Object.assign(form, blank(pageItem))
+}
+
+async function onHeroFileChange(event) {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    uploadingHero.value = true
+
+    try {
+        const data = new FormData()
+        data.append('image', file)
+        const response = await axios.post(route('platform.superadmin.marketing-pages.hero-image'), data)
+        form.hero_image_url = response.data.url
+    } finally {
+        uploadingHero.value = false
+        event.target.value = ''
+    }
 }
 
 function submit() {
@@ -193,6 +216,8 @@ function submit() {
 .field input, .field textarea { border: 1.5px solid #dbe4e8; border-radius: 8px; padding: 10px 12px; font: inherit; }
 .field input:focus, .field textarea:focus { outline: none; border-color: #ff7a59; }
 .field small { color: #8ca2a7; font-size: 12px; }
+.hero-upload-row { display: flex; align-items: center; gap: 10px; }
+.hero-upload-status { color: #ff7a59; font-size: 12px; font-weight: 800; }
 .publish-row { display: flex; align-items: center; gap: 8px; color: #344448; font-weight: 800; margin-bottom: 18px; }
 .actions-row { display: flex; gap: 12px; flex-wrap: wrap; }
 .btn-primary { background: #ff7a59; color: #fff; border: none; border-radius: 8px; padding: 11px 22px; font-weight: 900; cursor: pointer; }
